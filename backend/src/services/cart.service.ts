@@ -42,60 +42,66 @@ const cartService = {
   // ADD TO CART
   // ============================
   async addToCart(context: CartContext, variantId: number, quantity: number) {
-  const variant = await prisma.variant.findUnique({ where: { id: variantId } });
-  if (!variant) throw new Error("Variant not found");
-
-  if ("userId" in context) {
-    const userId = context.userId as number; // TS now knows this is number, not undefined
-
-    const existingItem = await prisma.cartItem.findUnique({
-      where: { userId_variantId: { userId, variantId } },
+    const variant = await prisma.variant.findUnique({
+      where: { id: variantId },
     });
+    if (!variant) throw new Error("Variant not found");
 
-    if (existingItem) {
-      return prisma.cartItem.update({
-        where: { id: existingItem.id },
-        data: { quantity: existingItem.quantity + quantity },
+    if ("userId" in context) {
+      const userId = context.userId as number; // TS now knows this is number, not undefined
+
+      const existingItem = await prisma.cartItem.findUnique({
+        where: { userId_variantId: { userId, variantId } },
+      });
+
+      if (existingItem) {
+        return prisma.cartItem.update({
+          where: { id: existingItem.id },
+          data: { quantity: existingItem.quantity + quantity },
+        });
+      }
+
+      return prisma.cartItem.create({
+        data: {
+          userId,
+          variantId,
+          quantity,
+          priceAtPurchase: variant.price,
+        },
+      });
+    } else {
+      const guestId = context.guestId;
+
+      const existingItem = await prisma.cartItem.findUnique({
+        where: { guestId_variantId: { guestId, variantId } },
+      });
+
+      if (existingItem) {
+        return prisma.cartItem.update({
+          where: { id: existingItem.id },
+          data: { quantity: existingItem.quantity + quantity },
+        });
+      }
+
+      return prisma.cartItem.create({
+        data: {
+          guestId,
+          variantId,
+          quantity,
+          priceAtPurchase: variant.price,
+        },
       });
     }
-
-    return prisma.cartItem.create({
-      data: {
-        userId,
-        variantId,
-        quantity,
-        priceAtPurchase: variant.price,
-      },
-    });
-  } else {
-    const guestId = context.guestId; 
-
-    const existingItem = await prisma.cartItem.findUnique({
-      where: { guestId_variantId: { guestId, variantId } },
-    });
-
-    if (existingItem) {
-      return prisma.cartItem.update({
-        where: { id: existingItem.id },
-        data: { quantity: existingItem.quantity + quantity },
-      });
-    }
-
-    return prisma.cartItem.create({
-      data: {
-        guestId,
-        variantId,
-        quantity,
-        priceAtPurchase: variant.price,
-      },
-    });
-  }
-},
+  },
 
   // ============================
   // UPDATE CART ITEM
   // ============================
-  async updateCartItem(context: CartContext, variantId: number, quantity: number) {
+  async updateCartItem(
+    context: CartContext,
+    variantId: number,
+    quantity: number
+  ) {
     if (quantity <= 0) throw new Error("Quantity must be greater than zero");
 
     if ("userId" in context) {
@@ -133,7 +139,9 @@ const cartService = {
     if ("userId" in context) {
       return prisma.cartItem.deleteMany({ where: { userId: context.userId } });
     } else {
-      return prisma.cartItem.deleteMany({ where: { guestId: context.guestId } });
+      return prisma.cartItem.deleteMany({
+        where: { guestId: context.guestId },
+      });
     }
   },
 

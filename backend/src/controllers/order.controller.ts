@@ -7,7 +7,8 @@ import orderService from "../services/order.service.ts";
 function resolveOrderContext(req: Request) {
   if (req.user) return { userId: req.user.userId as number };
   const guestId = req.headers["x-guest-id"];
-  if (!guestId || typeof guestId !== "string") throw new Error("Guest ID missing");
+  if (!guestId || typeof guestId !== "string")
+    throw new Error("Guest ID missing");
   return { guestId };
 }
 
@@ -17,7 +18,13 @@ function resolveOrderContext(req: Request) {
 export const createOrder = async (req: Request, res: Response) => {
   try {
     const context = resolveOrderContext(req);
-    const { shippingName, shippingAddress, shippingPhone, paymentMethod, transactionId } = req.body;
+    const {
+      shippingName,
+      shippingAddress,
+      shippingPhone,
+      paymentMethod,
+      transactionId,
+    } = req.body;
 
     if (!shippingName || !shippingAddress || !shippingPhone) {
       return res.status(400).json({ message: "Shipping info is required" });
@@ -74,7 +81,8 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     const orderId = Number(req.params.orderId);
     const { status } = req.body;
 
-    if (!orderId || !status) return res.status(400).json({ message: "Order ID and status required" });
+    if (!orderId || !status)
+      return res.status(400).json({ message: "Order ID and status required" });
 
     const updatedOrder = await orderService.updateOrderStatus(orderId, status);
     res.json(updatedOrder);

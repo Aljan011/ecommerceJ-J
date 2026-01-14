@@ -19,15 +19,15 @@ app.use(cors());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/categories", categoryRoutes); 
+app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
-app.use("/api/variants", variantRoutes); 
-app.use("/api/cart", cartRoutes)
-app.use("/api/order", orderRoutes)
+app.use("/api/variants", variantRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/order", orderRoutes);
 
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

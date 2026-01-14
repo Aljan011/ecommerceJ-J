@@ -64,11 +64,7 @@ const authService = {
     return { token, user: safeUser };
   },
 
-  async loginUser(
-    email: string,
-    password: string,
-    guestId?: string
-  ) {
+  async loginUser(email: string, password: string, guestId?: string) {
     const user = await prisma.user.findUnique({
       where: { email },
     });

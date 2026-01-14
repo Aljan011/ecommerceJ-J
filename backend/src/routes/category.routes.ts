@@ -1,7 +1,14 @@
 import { Router } from "express";
 
 import { authMiddleware } from "../middlewares/auth.middleware.ts";
-import { createCategory, getCategories, getCategoryById, updateCategory, deleteCategory, getCategoryProducts } from "../controllers/category.controller.ts";
+import {
+  createCategory,
+  getCategories,
+  getCategoryById,
+  updateCategory,
+  deleteCategory,
+  getCategoryProducts,
+} from "../controllers/category.controller.ts";
 import adminOnly from "../middlewares/role.middleware.ts";
 
 const router = Router();

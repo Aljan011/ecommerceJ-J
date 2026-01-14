@@ -1,5 +1,12 @@
 import { Router } from "express";
-import { getProducts, getProductsByCategory, createProduct, updateProduct, deleteProduct, getProduct } from "../controllers/product.controller.ts";
+import {
+  getProducts,
+  getProductsByCategory,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  getProduct,
+} from "../controllers/product.controller.ts";
 
 import { authMiddleware } from "../middlewares/auth.middleware.ts";
 import adminOnly from "../middlewares/role.middleware.ts";

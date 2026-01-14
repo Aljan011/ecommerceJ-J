@@ -1,7 +1,6 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from "express";
 
-export const requireRole =
-    (allowedRoles: string[]) => {
+export const requireRole = (allowedRoles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -15,11 +14,14 @@ export const requireRole =
   };
 };
 
+export default function adminOnly(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  if (!req.user || req.user.role !== "ADMIN") {
+    return res.status(401).json({ message: "admin access required" });
+  }
 
-export default function adminOnly(req: Request, res: Response, next: NextFunction) {
-    if (!req.user || req.user.role !== 'ADMIN') {
-        return res.status(401).json({ message: "admin access required" });
-    }
-
-    next();
-};
+  next();
+}

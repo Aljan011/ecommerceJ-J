@@ -7,7 +7,7 @@ import {
   clearCart,
   mergeGuestCart,
 } from "../controllers/cart.controller.ts";
-import {authMiddleware} from "../middlewares/auth.middleware.ts";
+import { authMiddleware } from "../middlewares/auth.middleware.ts";
 
 const router = Router();
 
@@ -17,9 +17,7 @@ const router = Router();
  * - authMiddleware is applied ONLY where user identity is required
  */
 
-
 // PUBLIC / GUEST CART ROUTES
-
 
 // Get cart (guest or user)
 router.get("/", getCart);
@@ -35,7 +33,6 @@ router.delete("/:variantId", removeCartItem);
 
 // Clear entire cart
 router.delete("/", clearCart);
-
 
 // AUTHENTICATED ONLY
 // Merge guest cart → user cart (after login)

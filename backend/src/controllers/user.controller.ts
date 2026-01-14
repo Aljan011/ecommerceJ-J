@@ -4,7 +4,7 @@ import userService from "../services/userService.ts";
 export const getMe = async (req: Request, res: Response) => {
   try {
     if (!req.user) {
-        return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Unauthorized" });
     }
     const userId = req.user.userId; // from auth middleware
     const user = await userService.getUserById(userId);
@@ -23,11 +23,15 @@ export const getMe = async (req: Request, res: Response) => {
 export const updateMe = async (req: Request, res: Response) => {
   try {
     if (!req.user) {
-        return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Unauthorized" });
     }
     const userId = req.user.userId; // from auth middleware
     const { email, name, password } = req.body;
-    const updatedUser = await userService.updateUser(userId, { email, name, password });
+    const updatedUser = await userService.updateUser(userId, {
+      email,
+      name,
+      password,
+    });
     const { password: _, ...safeUser } = updatedUser;
     res.json(safeUser);
   } catch {
@@ -38,15 +42,12 @@ export const updateMe = async (req: Request, res: Response) => {
 export const deleteMe = async (req: Request, res: Response) => {
   try {
     if (!req.user) {
-        return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Unauthorized" });
     }
     const userId = req.user.userId;
     await userService.deleteUser(userId);
     res.status(204).send();
-  }
-    catch {
+  } catch {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-

@@ -9,23 +9,11 @@ const router = Router();
 router.use(authMiddleware);
 
 // Logged-in USER or ADMIN
-router.get(
-  "/me",
-  requireRole(["USER", "ADMIN"]),
-  getMe
-);
+router.get("/me", requireRole(["USER", "ADMIN"]), getMe);
 
-router.put(
-  "/me",
-  requireRole(["USER", "ADMIN"]),
-  updateMe
-);
+router.put("/me", requireRole(["USER", "ADMIN"]), updateMe);
 
 //  Delete own account
-router.delete(
-  "/me",
-  requireRole(["USER", "ADMIN"]),
-  deleteMe
-);
+router.delete("/me", requireRole(["USER", "ADMIN"]), deleteMe);
 
-export const  userRoutes = router;
+export const userRoutes = router;

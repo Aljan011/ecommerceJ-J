@@ -96,7 +96,10 @@ const orderService = {
   },
 
   async getOrders(context: OrderContext) {
-    const whereClause = "userId" in context ? { userId: context.userId } : { guestId: context.guestId };
+    const whereClause =
+      "userId" in context
+        ? { userId: context.userId }
+        : { guestId: context.guestId };
 
     return prisma.order.findMany({
       where: whereClause,
@@ -115,7 +118,9 @@ const orderService = {
     const order = await prisma.order.findFirst({
       where: {
         id: orderId,
-        ...("userId" in context ? { userId: context.userId } : { guestId: context.guestId }),
+        ...("userId" in context
+          ? { userId: context.userId }
+          : { guestId: context.guestId }),
       },
       include: {
         items: {
@@ -129,7 +134,13 @@ const orderService = {
   },
 
   async updateOrderStatus(orderId: number, status: string) {
-    const validStatuses = ["PENDING", "PAID", "SHIPPED", "DELIVERED", "CANCELLED"];
+    const validStatuses = [
+      "PENDING",
+      "PAID",
+      "SHIPPED",
+      "DELIVERED",
+      "CANCELLED",
+    ];
     if (!validStatuses.includes(status)) throw new Error("Invalid status");
 
     return prisma.order.update({

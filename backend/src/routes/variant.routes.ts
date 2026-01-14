@@ -1,10 +1,10 @@
 import { Router } from "express";
 import {
-    getVariants,
-    getVariant,
-    createVariant,
-    updateVariant,
-    deleteVariant,
+  getVariants,
+  getVariant,
+  createVariant,
+  updateVariant,
+  deleteVariant,
 } from "../controllers/variant.controller.ts";
 
 import { authMiddleware } from "../middlewares/auth.middleware.ts";
