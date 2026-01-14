@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2020",
+
+    "types": ["node"],
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "esModuleInterop": true,
+
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    "strict": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+
+    "baseUrl": "src",
+    "paths": {
+      "@routes/*": ["routes/*"],
+    }
+  },
+
+  "include": [
+    "src/**/*"
+  ],
+
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

@@ -1,0 +1,169 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// =====================
+// USERS
+// =====================
+model user {
+  id            Int           @id @default(autoincrement())
+  name          String?
+  email         String?       @unique(map: "User_email_key")
+  password      String?
+  loginMethod   String        @default("NORMAL")
+  userType      String        @default("USER") // Admin, User
+  role          String        @default("USER")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  cartItems     CartItem[]
+  cartHistories CartHistory[]
+  orders        Order[]
+}
+
+// =====================
+// CATEGORIES
+// =====================
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String
+  imageUrl    String?
+  createdAt   DateTime  @default(now())
+
+  products Product[]
+}
+
+// =====================
+// PRODUCTS
+// =====================
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  imageUrl    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  categoryId  Int
+  category    Category  @relation(fields: [categoryId], references: [id])
+
+  variants       Variant[]
+}
+
+// =====================
+// VARIANTS
+// =====================
+model Variant {
+  id        Int      @id @default(autoincrement())
+  name      String   // e.g., "Red - Large"
+  price     Float
+  stock     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+
+  cartItems        CartItem[]
+  orderItems       OrderItem[]
+  cartHistoryItems CartHistoryItem[]
+}
+
+// =====================
+// CART ITEMS
+// =====================
+model CartItem {
+  id              Int      @id @default(autoincrement())
+  quantity        Int      @default(1)
+  addedAt         DateTime @default(now())
+  priceAtPurchase Float?
+
+  userId    Int?
+  user      user?    @relation(fields: [userId], references: [id])
+
+  guestId   String?
+
+  variantId Int
+  variant   Variant @relation(fields: [variantId], references: [id])
+
+  @@unique([userId, variantId]) // one cart item per user-variant pair
+  @@unique([guestId, variantId]) // one cart item per guest-variant pair
+}
+
+// =====================
+// CART HISTORY
+// =====================
+model CartHistory {
+  id        Int      @id @default(autoincrement())
+  status    String   // e.g., "COMPLETED", "CANCELLED"
+  createdAt DateTime @default(now())
+
+  userId Int
+  user   user @relation(fields: [userId], references: [id])
+
+  guestId String?
+
+  orderId Int
+  order   Order? @relation(fields: [orderId], references: [id])
+
+  items CartHistoryItem[]
+}
+
+model CartHistoryItem {
+  id              Int     @id @default(autoincrement())
+  quantity        Int
+  priceAtPurchase Float?
+
+  cartHistoryId Int
+  cartHistory   CartHistory @relation(fields: [cartHistoryId], references: [id])
+
+  variantId Int
+  variant   Variant @relation(fields: [variantId], references: [id])
+}
+
+// =====================
+// ORDERS
+// =====================
+model Order {
+  id          Int      @id @default(autoincrement())
+  totalAmount Float
+  status      String   @default("PENDING") // e.g., "PENDING", "SHIPPED", "DELIVERED"
+  createdAt   DateTime @default(now())
+
+  userId Int
+  user   user @relation(fields: [userId], references: [id])
+
+  guestId String?
+
+  shippingName    String
+  shippingAddress String
+  shippingPhone   String
+
+  paymentMethod String?
+  transactionId String?
+  paidAt        DateTime?
+
+  items         OrderItem[]
+  cartHistories CartHistory[]
+}
+
+// =====================
+// ORDER ITEMS
+// =====================
+model OrderItem {
+  id              Int     @id @default(autoincrement())
+  quantity        Int
+  priceAtPurchase Float
+
+  orderId Int
+  order   Order   @relation(fields: [orderId], references: [id])
+
+  variantId Int
+  variant   Variant @relation(fields: [variantId], references: [id])
+}
