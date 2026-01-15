@@ -4,6 +4,7 @@ const categoryService = {
   //--------------------
   // PUBLIC
   //--------------------
+
   async getAllCategories() {
     return prisma.category.findMany({
       orderBy: { createdAt: "desc" },
@@ -16,10 +17,12 @@ const categoryService = {
     });
   },
 
-  async getProductsByCategory(categoryId: number) {
+  async getProductsByCategory(categoryId: string) {
     return prisma.product.findMany({
       where: { categoryId },
-      include: { variants: true }, //price and stock info
+      include: {
+        variants: true, // price & stock info
+      },
     });
   },
 
@@ -38,8 +41,12 @@ const categoryService = {
   },
 
   async updateCategory(
-    categoryId: number,
-    data: { name?: string; description?: string; imageUrl?: string }
+    categoryId: string,
+    data: {
+      name?: string;
+      description?: string;
+      imageUrl?: string;
+    }
   ) {
     return prisma.category.update({
       where: { id: categoryId },
@@ -47,8 +54,8 @@ const categoryService = {
     });
   },
 
-  async deleteCategory(categoryId: number) {
-    // cant delete if products exist in category
+  async deleteCategory(categoryId: string) {
+    // prevent delete if products exist
     const productCount = await prisma.product.count({
       where: { categoryId },
     });

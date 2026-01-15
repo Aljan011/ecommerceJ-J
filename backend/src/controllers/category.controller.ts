@@ -1,9 +1,9 @@
 import type { Request, Response } from "express";
 import categoryService from "../services/category.service.ts";
 
-//-------------------------------
-//PUBLIC
-//-------------------------------
+// ===============================
+// PUBLIC
+// ===============================
 
 export const getCategories = async (_req: Request, res: Response) => {
   const categories = await categoryService.getAllCategories();
@@ -11,26 +11,35 @@ export const getCategories = async (_req: Request, res: Response) => {
 };
 
 export const getCategoryById = async (req: Request, res: Response) => {
-  // const categoryId = parseInt(req.params.id as string, 10);
-  const categoryId = req.params.id as string; // changed to normal (because we dont need to change the param id into number)
+  const { id } = req.params;
 
-  const category = await categoryService.getCategoryById(categoryId);
+  if (!id || Array.isArray(id)) {
+    return res.status(400).json({ message: "Invalid category id" });
+  }
+
+  const category = await categoryService.getCategoryById(id);
+
   if (!category) {
     return res.status(404).json({ message: "Category not found" });
   }
+
   res.json(category);
 };
 
 export const getCategoryProducts = async (req: Request, res: Response) => {
-  const categoryId = parseInt(req.params.id as string, 10);
+  const { id } = req.params;
 
-  const products = await categoryService.getProductsByCategory(categoryId);
+  if (!id || Array.isArray(id)) {
+    return res.status(400).json({ message: "Invalid category id" });
+  }
+
+  const products = await categoryService.getProductsByCategory(id);
   res.json(products);
 };
 
-//-------------------------------
-//ADMIN
-//-------------------------------
+// ===============================
+// ADMIN
+// ===============================
 
 export const createCategory = async (req: Request, res: Response) => {
   const { name, description, imageUrl } = req.body;
@@ -46,19 +55,28 @@ export const createCategory = async (req: Request, res: Response) => {
     description,
     imageUrl,
   });
+
   res.status(201).json(category);
 };
 
 export const updateCategory = async (req: Request, res: Response) => {
-  const categoryId = parseInt(req.params.id as string, 10);
+  const { id } = req.params;
 
-  const category = await categoryService.updateCategory(categoryId, req.body);
+  if (!id || Array.isArray(id)) {
+    return res.status(400).json({ message: "Invalid category id" });
+  }
+
+  const category = await categoryService.updateCategory(id, req.body);
   res.json(category);
 };
 
 export const deleteCategory = async (req: Request, res: Response) => {
-  const categoryId = parseInt(req.params.id as string, 10);
+  const { id } = req.params;
 
-  await categoryService.deleteCategory(categoryId);
+  if (!id || Array.isArray(id)) {
+    return res.status(400).json({ message: "Invalid category id" });
+  }
+
+  await categoryService.deleteCategory(id);
   res.status(204).send();
 };
