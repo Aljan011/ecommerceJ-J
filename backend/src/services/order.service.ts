@@ -2,7 +2,7 @@ import prisma from "../config/prisma.ts";
 import cartService from "./cart.service.ts";
 
 type OrderContext =
-  | { userId: number; guestId?: never }
+  | { userId: string; guestId?: never }
   | { guestId: string; userId?: never };
 
 interface OrderInput {
@@ -15,19 +15,19 @@ interface OrderInput {
 
 const orderService = {
   async createOrder(context: OrderContext, orderData: OrderInput) {
-    //  Fetch cart items
+    // Fetch cart items
     const cartItems = await cartService.getCart(context);
     if (!cartItems || cartItems.length === 0) {
       throw new Error("Cart is empty");
     }
 
-    //  Calculate total amount
+    // Calculate total amount
     const totalAmount = cartItems.reduce(
       (sum, item) => sum + (item.priceAtPurchase ?? 0) * item.quantity,
       0
     );
 
-    //  Build order data conditionally
+    // Build order data
     const orderCreateData: any = {
       totalAmount,
       status: "PENDING",
@@ -42,21 +42,28 @@ const orderService = {
           : undefined,
     };
 
-    if ("userId" in context) orderCreateData.userId = context.userId;
-    if ("guestId" in context) orderCreateData.guestId = context.guestId;
+    if ("userId" in context) {
+      orderCreateData.userId = context.userId;
+    } else {
+      orderCreateData.guestId = context.guestId;
+    }
 
-    //  Create order
+    // Create order
     const order = await prisma.order.create({
       data: orderCreateData,
     });
 
-    //  Save cart history
+    // Save cart history
     const cartHistoryData: any = {
       status: "ordered",
       orderId: order.id,
     };
-    if ("userId" in context) cartHistoryData.userId = context.userId;
-    if ("guestId" in context) cartHistoryData.guestId = context.guestId;
+
+    if ("userId" in context) {
+      cartHistoryData.userId = context.userId;
+    } else {
+      cartHistoryData.guestId = context.guestId;
+    }
 
     const cartHistory = await prisma.cartHistory.create({
       data: cartHistoryData,
@@ -71,7 +78,7 @@ const orderService = {
 
     await prisma.cartHistoryItem.createMany({ data: cartHistoryItems });
 
-    //  Create order items
+    // Create order items
     const orderItems = cartItems.map((item) => ({
       orderId: order.id,
       variantId: item.variantId,
@@ -81,7 +88,7 @@ const orderService = {
 
     await prisma.orderItem.createMany({ data: orderItems });
 
-    //  Decrement variant stock
+    // Decrement variant stock
     for (const item of cartItems) {
       await prisma.variant.update({
         where: { id: item.variantId },
@@ -89,7 +96,7 @@ const orderService = {
       });
     }
 
-    //  Clear cart
+    // Clear cart
     await cartService.clearCart(context);
 
     return order;
@@ -114,7 +121,7 @@ const orderService = {
     });
   },
 
-  async getOrderById(orderId: number, context: OrderContext) {
+  async getOrderById(orderId: string, context: OrderContext) {
     const order = await prisma.order.findFirst({
       where: {
         id: orderId,
@@ -133,7 +140,7 @@ const orderService = {
     return order;
   },
 
-  async updateOrderStatus(orderId: number, status: string) {
+  async updateOrderStatus(orderId: string, status: string) {
     const validStatuses = [
       "PENDING",
       "PAID",
@@ -141,7 +148,10 @@ const orderService = {
       "DELIVERED",
       "CANCELLED",
     ];
-    if (!validStatuses.includes(status)) throw new Error("Invalid status");
+
+    if (!validStatuses.includes(status)) {
+      throw new Error("Invalid status");
+    }
 
     return prisma.order.update({
       where: { id: orderId },

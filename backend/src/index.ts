@@ -10,6 +10,7 @@ import { productRoutes } from "./routes/product.routes.ts";
 import { variantRoutes } from "./routes/variant.routes.ts";
 import { cartRoutes } from "./routes/cart.routes.ts";
 import { orderRoutes } from "./routes/order.routes.ts";
+import { adminRoutes } from "./routes/admin.routes.ts";
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/variants", variantRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/order", orderRoutes);
+app.use("/admin", adminRoutes)
 
 app.use(errorHandler);
 

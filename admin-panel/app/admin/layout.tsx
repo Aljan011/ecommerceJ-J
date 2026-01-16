@@ -13,7 +13,7 @@ function AdminGuard({ children }: { children: ReactNode }) {
         if (!loading && !admin && pathname !== "/admin/login") {
             router.replace("/admin/login");
         }
-    }, [admin, loading, pathname, router ]);
+    }, [admin, loading, pathname, router]);
 
     if (loading) {
         return (
@@ -26,10 +26,10 @@ function AdminGuard({ children }: { children: ReactNode }) {
     return <>{children}</>;
 }
 
-export default function AdminLayout({ children }: {children: ReactNode}) {
+export default function AdminLayout({ children }: { children: ReactNode }) {
     return (
         <AdminAuthProvider>
-            {children}
+            <AdminGuard >{children}</AdminGuard>
         </AdminAuthProvider>
     );
 };

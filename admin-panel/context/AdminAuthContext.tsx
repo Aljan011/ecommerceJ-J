@@ -30,7 +30,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   // ============================
-  // 🔁 Restore session on refresh
+  //  Restore session on refresh
   // ============================
   useEffect(() => {
     const storedToken = localStorage.getItem("adminToken");
@@ -67,7 +67,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // ============================
-  // 🔐 Login
+  //  Login
   // ============================
   const login = async (email: string, password: string) => {
     const { token, user } = await adminLogin(email, password);
@@ -91,7 +91,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   };
 
   // ============================
-  // 🚪 Logout
+  //  Logout
   // ============================
   const logout = () => {
     localStorage.removeItem("adminToken");

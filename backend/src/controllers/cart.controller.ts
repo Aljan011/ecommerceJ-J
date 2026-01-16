@@ -9,7 +9,7 @@ import cartService from "../services/cart.service.ts";
  */
 function resolveCartContext(req: Request) {
   if (req.user) {
-    return { userId: req.user.userId as number };
+    return { userId: String(req.user.userId) };
   }
 
   let guestId = req.headers["x-guest-id"];
@@ -57,10 +57,12 @@ export const addToCart = async (req: Request, res: Response) => {
     }
 
     const context = resolveCartContext(req);
+
+    // Pass variantId and quantity as string/number properly
     const item = await cartService.addToCart(
       context,
-      Number(variantId),
-      Number(quantity)
+      variantId as string,
+      quantity
     );
 
     const response: any = { item };
@@ -88,10 +90,11 @@ export const updateCartItem = async (req: Request, res: Response) => {
     }
 
     const context = resolveCartContext(req);
+
     await cartService.updateCartItem(
       context,
-      Number(variantId),
-      Number(quantity)
+      variantId as string,
+      quantity
     );
 
     res.json({ message: "Cart item updated" });
@@ -105,11 +108,11 @@ export const updateCartItem = async (req: Request, res: Response) => {
 // ============================
 export const removeCartItem = async (req: Request, res: Response) => {
   try {
-    const variantId = Number(req.params.variantId);
+    let variantId = req.params.variantId;
+    if (!variantId) return res.status(400).json({ message: "variantId required" });
 
-    if (!variantId) {
-      return res.status(400).json({ message: "variantId required" });
-    }
+    // Handle array case
+    if (Array.isArray(variantId)) variantId = variantId[0];
 
     const context = resolveCartContext(req);
     await cartService.removeCartItem(context, variantId);
@@ -148,7 +151,8 @@ export const mergeGuestCart = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Guest ID missing" });
     }
 
-    await cartService.mergeGuestCartToUser(guestId, req.user.userId as number);
+    // userId is string (UUID)
+    await cartService.mergeGuestCartToUser(guestId, String(req.user.userId));
 
     res.json({ message: "Guest cart merged successfully" });
   } catch (err: any) {

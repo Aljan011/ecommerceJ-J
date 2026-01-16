@@ -1,8 +1,8 @@
 import prisma from "../config/prisma.ts";
 
 type CartContext =
-  | { userId: number; guestId?: never }
-  | { guestId: string; userId?: never };
+  | { userId: string }
+  | { guestId: string };
 
 const cartService = {
   // ============================
@@ -41,17 +41,17 @@ const cartService = {
   // ============================
   // ADD TO CART
   // ============================
-  async addToCart(context: CartContext, variantId: number, quantity: number) {
+  async addToCart(context: CartContext, variantId: string, quantity: number) {
     const variant = await prisma.variant.findUnique({
       where: { id: variantId },
     });
     if (!variant) throw new Error("Variant not found");
 
     if ("userId" in context) {
-      const userId = context.userId as number; // TS now knows this is number, not undefined
+      const userId: string = context.userId;
 
       const existingItem = await prisma.cartItem.findUnique({
-        where: { userId_variantId: { userId, variantId } },
+        where: { userId_variantId: { userId: context.userId!, variantId } },
       });
 
       if (existingItem) {
@@ -70,7 +70,7 @@ const cartService = {
         },
       });
     } else {
-      const guestId = context.guestId;
+      const guestId = context.guestId!;
 
       const existingItem = await prisma.cartItem.findUnique({
         where: { guestId_variantId: { guestId, variantId } },
@@ -97,11 +97,7 @@ const cartService = {
   // ============================
   // UPDATE CART ITEM
   // ============================
-  async updateCartItem(
-    context: CartContext,
-    variantId: number,
-    quantity: number
-  ) {
+  async updateCartItem(context: CartContext, variantId: string, quantity: number) {
     if (quantity <= 0) throw new Error("Quantity must be greater than zero");
 
     if ("userId" in context) {
@@ -120,7 +116,7 @@ const cartService = {
   // ============================
   // REMOVE ITEM
   // ============================
-  async removeCartItem(context: CartContext, variantId: number) {
+  async removeCartItem(context: CartContext, variantId: string) {
     if ("userId" in context) {
       return prisma.cartItem.deleteMany({
         where: { userId: context.userId, variantId },
@@ -139,16 +135,14 @@ const cartService = {
     if ("userId" in context) {
       return prisma.cartItem.deleteMany({ where: { userId: context.userId } });
     } else {
-      return prisma.cartItem.deleteMany({
-        where: { guestId: context.guestId },
-      });
+      return prisma.cartItem.deleteMany({ where: { guestId: context.guestId } });
     }
   },
 
   // ============================
   // MERGE GUEST CART → USER
   // ============================
-  async mergeGuestCartToUser(guestId: string, userId: number) {
+  async mergeGuestCartToUser(guestId: string, userId: string) {
     const guestItems = await prisma.cartItem.findMany({ where: { guestId } });
 
     for (const item of guestItems) {

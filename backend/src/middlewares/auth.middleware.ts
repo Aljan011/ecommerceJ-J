@@ -2,12 +2,20 @@ import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 interface JwtPayload {
-  userId: number | string;
+  userId: string; // UUID as string
   role: string;
 }
 
+// Extend Express Request to include `user`
+export interface AuthenticatedRequest extends Request {
+  user?: {
+    userId: string;
+    role: string;
+  };
+}
+
 export const authMiddleware = (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -22,12 +30,10 @@ export const authMiddleware = (
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
 
     req.user = {
-      userId:
-        typeof decoded.userId === "string"
-          ? Number(decoded.userId)
-          : decoded.userId,
+      userId: String(decoded.userId), // always store as string
       role: decoded.role,
     };
+
     next();
   } catch {
     return res.status(401).json({ message: "Unauthorized" });

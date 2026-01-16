@@ -1,7 +1,7 @@
 import prisma from "../config/prisma.ts";
 
 const productService = {
-  //----- PUBLIC ----
+  // ----- PUBLIC -----
 
   async getAllProducts() {
     return prisma.product.findMany({
@@ -15,7 +15,7 @@ const productService = {
     });
   },
 
-  async getProductById(productId: number) {
+  async getProductById(productId: string) {
     return prisma.product.findUnique({
       where: { id: productId },
       include: {
@@ -27,7 +27,7 @@ const productService = {
     });
   },
 
-  async getProductsByCategory(categoryId: number) {
+  async getProductsByCategory(categoryId: string) {
     return prisma.product.findMany({
       where: { categoryId },
       include: {
@@ -39,12 +39,13 @@ const productService = {
     });
   },
 
-  //----- ADMIN ----
+  // ----- ADMIN -----
+
   async createProduct(data: {
     name: string;
     description: string;
     imageUrl?: string;
-    categoryId: number;
+    categoryId: string;
   }) {
     return prisma.product.create({
       data,
@@ -58,12 +59,12 @@ const productService = {
   },
 
   async updateProduct(
-    productId: number,
+    productId: string,
     data: {
       name?: string;
       description?: string;
       imageUrl?: string;
-      categoryId?: number;
+      categoryId?: string;
     }
   ) {
     return prisma.product.update({
@@ -78,8 +79,8 @@ const productService = {
     });
   },
 
-  async deleteProduct(productId: number) {
-    //cascade delete variants automatically handledf by prisma if relation set
+  async deleteProduct(productId: string) {
+    // Cascade delete variants handled by Prisma if relation is set
     return prisma.product.delete({
       where: { id: productId },
     });

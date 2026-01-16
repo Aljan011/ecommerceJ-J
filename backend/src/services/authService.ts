@@ -5,18 +5,25 @@ import userService from "./userService.ts";
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
+// Strict type for roles
+export type Role = "ADMIN" | "USER";
+
 interface AuthPayload {
-  userId: number;
-  role: string;
+  userId: number; // must match Prisma user.id type
+  role: Role;
 }
 
 const authService = {
+  // ==========================
+  // REGISTER USER
+  // ==========================
   async registerUser(
     email: string,
     password: string,
     name?: string,
     guestId?: string
   ) {
+    // Check if user exists
     const existingUser = await userService.getUserByEmail(email);
     if (existingUser) {
       throw new Error("Email already in use");
@@ -24,6 +31,7 @@ const authService = {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Create user
     const user = await prisma.user.create({
       data: {
         email,
@@ -34,7 +42,7 @@ const authService = {
       },
     });
 
-    //  Merge guest cart & history into user
+    // Merge guest cart & history into new user
     if (guestId) {
       await prisma.cartItem.updateMany({
         where: { guestId },
@@ -53,9 +61,10 @@ const authService = {
       });
     }
 
+    // JWT payload
     const payload: AuthPayload = {
-      userId: user.id,
-      role: user.role,
+      userId: Number(user.id), // ensure number type
+      role: user.role as Role,
     };
 
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
@@ -64,6 +73,9 @@ const authService = {
     return { token, user: safeUser };
   },
 
+  // ==========================
+  // LOGIN USER
+  // ==========================
   async loginUser(email: string, password: string, guestId?: string) {
     const user = await prisma.user.findUnique({
       where: { email },
@@ -78,7 +90,7 @@ const authService = {
       throw new Error("Invalid credentials");
     }
 
-    //  Merge guest cart on login
+    // Merge guest cart on login
     if (guestId) {
       await prisma.cartItem.updateMany({
         where: { guestId },
@@ -97,15 +109,29 @@ const authService = {
       });
     }
 
+    // JWT payload
     const payload: AuthPayload = {
-      userId: user.id,
-      role: user.role,
+      userId: Number(user.id), // ensure number
+      role: user.role as Role,
     };
 
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
 
     const { password: _, ...safeUser } = user;
     return { token, user: safeUser };
+  },
+
+  // ==========================
+  // ADMIN LOGIN (optional separate method)
+  // ==========================
+  async loginAdmin(email: string, password: string) {
+    const { user, token } = await this.loginUser(email, password);
+
+    if (user.role !== "ADMIN") {
+      throw new Error("Access denied: not an admin");
+    }
+
+    return { user, token };
   },
 };
 

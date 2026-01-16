@@ -7,14 +7,14 @@ export const validate =
     validator: Validator<T>,
     property: "body" | "params" | "query" = "body"
   ) =>
-  (req: Request, res: Response, next: NextFunction) => {
-    try {
-      validator(req[property]);
-      next();
-    } catch (err: any) {
-      return res.status(400).json({
-        message: "Validation Error",
-        errors: err.errors ?? err,
-      });
-    }
-  };
+    (req: Request, res: Response, next: NextFunction) => {
+      try {
+        validator(req[property]);
+        next();
+      } catch (err: any) {
+        return res.status(400).json({
+          message: "Validation Error",
+          errors: err.errors ?? err,
+        });
+      }
+    };

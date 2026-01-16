@@ -1,22 +1,24 @@
 import prisma from "../config/prisma.ts";
 
 const variantService = {
-  //----- PUBLIC ----
-  async getVariantByProduct(productId: number) {
-    return prisma.variant.findUnique({
-      where: { id: productId },
+  // ----- PUBLIC ----
+
+  async getVariantByProduct(productId: string) {
+    return prisma.variant.findMany({
+      where: { productId },
     });
   },
 
-  async getVariantById(variantId: number) {
+  async getVariantById(variantId: string) {
     return prisma.variant.findUnique({
       where: { id: variantId },
     });
   },
 
-  //----- ADMIN ----
+  // ----- ADMIN ----
+
   async createVariant(data: {
-    productId: number;
+    productId: string;
     price: number;
     stock: number;
     name: string;
@@ -27,8 +29,13 @@ const variantService = {
   },
 
   async updateVariant(
-    variantId: number,
-    data: { name?: string; price?: number; stock?: number; productId?: number }
+    variantId: string,
+    data: {
+      name?: string;
+      price?: number;
+      stock?: number;
+      productId?: string;
+    }
   ) {
     return prisma.variant.update({
       where: { id: variantId },
@@ -36,7 +43,7 @@ const variantService = {
     });
   },
 
-  async deleteVariant(variantId: number) {
+  async deleteVariant(variantId: string) {
     return prisma.variant.delete({
       where: { id: variantId },
     });

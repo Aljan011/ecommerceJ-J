@@ -1,50 +1,77 @@
 import type { Request, Response } from "express";
 import variantService from "../services/variant.service.ts";
 
+function getParamString(param: string | string[] | undefined, paramName: string): string {
+  if (!param) throw new Error(`${paramName} is required`);
+  if (Array.isArray(param)) return param[0];
+  return param;
+}
+
 //----Public Controllers----//
 export const getVariants = async (req: Request, res: Response) => {
-  const productId = parseInt(req.params.productId as string, 10);
-  const variants = await variantService.getVariantByProduct(productId);
-  res.json(variants);
+  try {
+    const productId = getParamString(req.params.productId, "Product ID");
+
+    const variants = await variantService.getVariantByProduct(productId);
+    res.json(variants);
+  } catch (err: any) {
+    res.status(400).json({ message: err.message });
+  }
 };
 
 export const getVariant = async (req: Request, res: Response) => {
-  const variantId = parseInt(req.params.id as string, 10);
-  const variant = await variantService.getVariantById(variantId);
+  try {
+    const variantId = getParamString(req.params.id, "Variant ID");
 
-  if (!variant) return res.status(404).json({ message: "Variant not found" });
-  res.json(variant);
+    const variant = await variantService.getVariantById(variantId);
+    if (!variant) return res.status(404).json({ message: "Variant not found" });
+    res.json(variant);
+  } catch (err: any) {
+    res.status(400).json({ message: err.message });
+  }
 };
 
 //----Admin Controllers----//
 export const createVariant = async (req: Request, res: Response) => {
-  const { productId, name, price, stock } = req.body;
-  if (!name || price == null || stock == null || !productId) {
-    return res
-      .status(400)
-      .json({ message: "Name, price, stock, and productId are required" });
-  }
+  try {
+    const { productId, name, price, stock } = req.body;
 
-  const variant = await variantService.createVariant({
-    productId,
-    name,
-    price,
-    stock,
-  });
-  res.status(201).json(variant);
+    if (!productId || !name || price == null || stock == null) {
+      return res
+        .status(400)
+        .json({ message: "Product ID, name, price, and stock are required" });
+    }
+
+    const variant = await variantService.createVariant({
+      productId,
+      name,
+      price,
+      stock,
+    });
+    res.status(201).json(variant);
+  } catch (err: any) {
+    res.status(400).json({ message: err.message });
+  }
 };
 
 export const updateVariant = async (req: Request, res: Response) => {
-  const variantId = parseInt(req.params.id as string, 10);
-  const updatedVariant = await variantService.updateVariant(
-    variantId,
-    req.body
-  );
-  res.json(updatedVariant);
+  try {
+    const variantId = getParamString(req.params.id, "Variant ID");
+
+    const updatedVariant = await variantService.updateVariant(variantId, req.body);
+    res.json(updatedVariant);
+  } catch (err: any) {
+    res.status(400).json({ message: err.message });
+  }
 };
 
 export const deleteVariant = async (req: Request, res: Response) => {
-  const variantId = parseInt(req.params.id as string, 10);
-  await variantService.deleteVariant(variantId);
-  res.status(204).send();
+  try {
+    const variantId = getParamString(req.params.id, "Variant ID");
+
+    await variantService.deleteVariant(variantId);
+    res.status(204).send();
+  } catch (err: any) {
+    res.status(400).json({ message: err.message });
+  }
 };
