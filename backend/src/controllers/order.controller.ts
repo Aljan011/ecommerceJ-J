@@ -25,7 +25,13 @@ function resolveOrderContext(req: Request) {
 export const createOrder = async (req: Request, res: Response) => {
   try {
     const context = resolveOrderContext(req);
-    const { shippingName, shippingAddress, shippingPhone, paymentMethod, transactionId } = req.body;
+    const { shippingName,
+      shippingAddress,
+      shippingPhone,
+      paymentMethod,
+      transactionId,
+      items //optional for direct purchase
+    } = req.body;
 
     if (!shippingName || !shippingAddress || !shippingPhone) {
       return res.status(400).json({ message: "Shipping info is required" });
@@ -37,6 +43,7 @@ export const createOrder = async (req: Request, res: Response) => {
       shippingPhone,
       paymentMethod,
       transactionId,
+      items
     });
 
     res.status(201).json(order);

@@ -11,23 +11,57 @@ interface OrderInput {
   shippingPhone: string;
   paymentMethod?: string;
   transactionId?: string;
+
+  //direct purchase item
+  items?: {
+    variantId: string;
+    quantity: number;
+    priceAtPurchase?: number;
+  }[];
 }
 
 const orderService = {
-  async createOrder(context: OrderContext, orderData: OrderInput) {
-    // Fetch cart items
-    const cartItems = await cartService.getCart(context);
-    if (!cartItems || cartItems.length === 0) {
-      throw new Error("Cart is empty");
+  async createOrder(context: OrderContext, orderData: OrderInput & { items?: { variantId: string; quantity: number; priceAtPurchase?: number }[] }) {
+    // 1. Fetch cart items
+    let cartItems = await cartService.getCart(context);
+
+    // 2. If cart is empty, use direct order items
+    if ((!cartItems || cartItems.length === 0) && orderData.items) {
+      cartItems = await Promise.all(
+        orderData.items.map(async (item) => {
+          const variant = await prisma.variant.findUnique({
+            where: { id: item.variantId },
+            include: { product: { include: { category: true } } },
+          });
+
+          if (!variant) throw new Error(`Variant ${item.variantId} not found`);
+
+          return {
+            id: "direct-" + item.variantId, // dummy id for direct purchase
+            variant,
+            quantity: item.quantity,
+            addedAt: new Date(),
+            priceAtPurchase: variant.price,
+            userId: "userId" in context ? context.userId : null,
+            guestId: "guestId" in context ? context.guestId : null,
+            variantId: variant.id,
+          } as unknown as typeof cartItems[number]; // cast to satisfy TS
+        })
+      );
     }
 
-    // Calculate total amount
+    // 3. Still empty? throw error
+    if (!cartItems || cartItems.length === 0) {
+      throw new Error("No items to order");
+    }
+
+    // 4. Calculate total amount
     const totalAmount = cartItems.reduce(
       (sum, item) => sum + (item.priceAtPurchase ?? 0) * item.quantity,
       0
     );
 
-    // Build order data
+    // 5. Build order data
     const orderCreateData: any = {
       totalAmount,
       status: "PENDING",
@@ -42,33 +76,23 @@ const orderService = {
           : undefined,
     };
 
-    if ("userId" in context) {
-      orderCreateData.userId = context.userId;
-    } else {
-      orderCreateData.guestId = context.guestId;
-    }
+    if ("userId" in context) orderCreateData.userId = context.userId;
+    if ("guestId" in context) orderCreateData.guestId = context.guestId;
 
-    // Create order
-    const order = await prisma.order.create({
-      data: orderCreateData,
-    });
+    // 6. Create order
+    const order = await prisma.order.create({ data: orderCreateData });
 
-    // Save cart history
+    // 7. Save cart history
     const cartHistoryData: any = {
       status: "ordered",
       orderId: order.id,
+      userId: "userId" in context ? context.userId : undefined,
+      guestId: "guestId" in context ? context.guestId : undefined,
     };
 
-    if ("userId" in context) {
-      cartHistoryData.userId = context.userId;
-    } else {
-      cartHistoryData.guestId = context.guestId;
-    }
+    const cartHistory = await prisma.cartHistory.create({ data: cartHistoryData });
 
-    const cartHistory = await prisma.cartHistory.create({
-      data: cartHistoryData,
-    });
-
+    // 8. Save cart history items
     const cartHistoryItems = cartItems.map((item) => ({
       cartHistoryId: cartHistory.id,
       variantId: item.variantId,
@@ -78,7 +102,7 @@ const orderService = {
 
     await prisma.cartHistoryItem.createMany({ data: cartHistoryItems });
 
-    // Create order items
+    // 9. Create order items
     const orderItems = cartItems.map((item) => ({
       orderId: order.id,
       variantId: item.variantId,
@@ -88,7 +112,7 @@ const orderService = {
 
     await prisma.orderItem.createMany({ data: orderItems });
 
-    // Decrement variant stock
+    // 10. Decrement variant stock
     for (const item of cartItems) {
       await prisma.variant.update({
         where: { id: item.variantId },
@@ -96,7 +120,7 @@ const orderService = {
       });
     }
 
-    // Clear cart
+    // 11. Clear cart if it was a logged-in user or guest cart
     await cartService.clearCart(context);
 
     return order;
