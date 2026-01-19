@@ -5,7 +5,7 @@ import { useStore } from "@/hooks";
 import { useLoginMutation } from "@/lib";
 import { useEffect } from "react";
 
-export const LoginPage = () => {
+export default function LoginPage() {
   const { dispatch } = useStore();
   const { mutate, isError, data, isPending } = useLoginMutation();
 
@@ -26,4 +26,4 @@ export const LoginPage = () => {
       isError={isError}
     />
   );
-};
+}

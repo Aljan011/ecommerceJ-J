@@ -3,7 +3,7 @@ import axios, { AxiosError } from "axios";
 // Create Axios instance
 export const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
-  withCredentials: true, // include cookies
+  // withCredentials: true, // include cookies
 });
 
 // Request interceptor: add token
@@ -12,6 +12,7 @@ apiClient.interceptors.request.use(
     const token = localStorage.getItem("accessToken");
     if (token && config.headers) {
       config.headers["Authorization"] = `Bearer ${token}`;
+      config.headers["Content-Type"] = "application/json";
     }
     return config;
   },

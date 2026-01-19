@@ -28,7 +28,7 @@ export const useLoginMutation = (
 ) => {
   return useMutation<LoginMutationResponse, Error, LoginMutationPayload>({
     mutationKey: ["login"],
-    mutationFn: (payload) => apiClient.post("/login", payload),
+    mutationFn: (payload) => apiClient.post("/auth/login", payload),
     ...options,
   });
 };
@@ -38,7 +38,7 @@ export const useMeQuery = (
 ) => {
   return useQuery<MeQueryResponse>({
     queryKey: ["me"],
-    queryFn: () => apiClient.get("/me"),
+    queryFn: () => apiClient.get("/users/me"),
     retry: false,
     ...options,
   });

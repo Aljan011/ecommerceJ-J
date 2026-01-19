@@ -2,6 +2,7 @@ import { IUser } from "@/types";
 
 export type AuthState = {
   meEntity: IUser | null;
+  isLoading: boolean;
 };
 
 export type UIState = {
@@ -15,7 +16,9 @@ export type RootState = {
 
 export type AuthAction =
   | { type: "LOGIN_SUCCESS"; payload: IUser }
-  | { type: "LOGOUT" };
+  | { type: "LOGOUT" }
+  | { type: "START_AUTH_LOADING" }
+  | { type: "STOP_AUTH_LOADING" };
 
 export type UiAction = { type: "START_LOADING" } | { type: "STOP_LOADING" };
 

@@ -1,14 +1,7 @@
 "use client";
 
-import { LoginForm } from "@/components";
-import { useStore } from "@/hooks";
-import { useEffect } from "react";
+import { AdminDashboard } from "@/components";
 
 export default function AdminPage() {
-  const { auth } = useStore();
-
-  useEffect(() => {
-    console.log(auth);
-  }, [auth]);
-  return <LoginForm />;
+  return <AdminDashboard />;
 }
