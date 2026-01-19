@@ -6,3 +6,4 @@ export * from "./order.service.ts";
 export * from "./product.service.ts";
 export * from "./userService.ts";
 export * from "./variant.service.ts";
+export * from "../emails/services/email.service.ts"
