@@ -1,4 +1,6 @@
-import { useStoreContext } from "@/store/store";
+"use client";
+
+import { useStoreContext } from "@/context";
 
 export const useStore = () => {
   const { state, dispatch } = useStoreContext();

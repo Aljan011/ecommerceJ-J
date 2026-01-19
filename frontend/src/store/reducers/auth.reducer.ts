@@ -1,16 +1,17 @@
-import { AuthState, Action } from "../types";
+import { AuthState, RootAction } from "../types";
 
 export const authInitialState: AuthState = {
-  accessToken: null,
-  isAuthenticated: false,
+  meEntity: null,
 };
 
-export const authReducer = (state: AuthState, action: Action): AuthState => {
+export const authReducer = (
+  state: AuthState,
+  action: RootAction,
+): AuthState => {
   switch (action.type) {
     case "LOGIN_SUCCESS":
       return {
-        accessToken: action.payload,
-        isAuthenticated: true,
+        meEntity: action.payload,
       };
     case "LOGOUT":
       return authInitialState;

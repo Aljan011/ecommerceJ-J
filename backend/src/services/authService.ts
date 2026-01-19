@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 export type Role = "ADMIN" | "USER";
 
 interface AuthPayload {
-  userId: number; // must match Prisma user.id type
+  userId: string;
   role: Role;
 }
 
@@ -21,7 +21,7 @@ const authService = {
     email: string,
     password: string,
     name?: string,
-    guestId?: string
+    guestId?: string,
   ) {
     // Check if user exists
     const existingUser = await userService.getUserByEmail(email);
@@ -63,7 +63,7 @@ const authService = {
 
     // JWT payload
     const payload: AuthPayload = {
-      userId: Number(user.id), // ensure number type
+      userId: user.id,
       role: user.role as Role,
     };
 
@@ -111,7 +111,7 @@ const authService = {
 
     // JWT payload
     const payload: AuthPayload = {
-      userId: Number(user.id), // ensure number
+      userId: user.id, // ensure number
       role: user.role as Role,
     };
 

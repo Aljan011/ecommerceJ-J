@@ -1,10 +1,10 @@
-import { UIState, Action } from "../types";
+import { UIState, RootAction } from "../types";
 
 export const uiInitialState: UIState = {
   loading: false,
 };
 
-export const uiReducer = (state: UIState, action: Action): UIState => {
+export const uiReducer = (state: UIState, action: RootAction): UIState => {
   switch (action.type) {
     case "START_LOADING":
       return { loading: true };

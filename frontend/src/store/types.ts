@@ -1,6 +1,7 @@
+import { IUser } from "@/types";
+
 export type AuthState = {
-  accessToken: string | null;
-  isAuthenticated: boolean;
+  meEntity: IUser | null;
 };
 
 export type UIState = {
@@ -12,8 +13,10 @@ export type RootState = {
   ui: UIState;
 };
 
-export type Action =
-  | { type: "LOGIN_SUCCESS"; payload: string }
-  | { type: "LOGOUT" }
-  | { type: "START_LOADING" }
-  | { type: "STOP_LOADING" };
+export type AuthAction =
+  | { type: "LOGIN_SUCCESS"; payload: IUser }
+  | { type: "LOGOUT" };
+
+export type UiAction = { type: "START_LOADING" } | { type: "STOP_LOADING" };
+
+export type RootAction = AuthAction | UiAction;
