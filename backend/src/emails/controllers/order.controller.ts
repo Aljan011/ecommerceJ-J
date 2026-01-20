@@ -69,7 +69,7 @@ export const createOrder = async (req: Request, res: Response) => {
                     items: order.items.map((item) => ({
                         id: item.id,
                         variantId: item.variantId,
-                        name: item.variant.name,     // ⚠ include variant name
+                        name: item.variant.name,     
                         quantity: item.quantity,
                         priceAtPurchase: item.priceAtPurchase,
                     })),

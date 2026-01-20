@@ -1,22 +1,15 @@
-import { Resend } from "resend";
+import { mailTransporter } from "../config/mail.ts";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-type SendEmailParams = {
-    to: string | string[];
-    subject: string;
-    html: string;
+type SendEmailOptions = {
+  to: string | string[];
+  subject: string;
+  html: string;
 };
 
-export const sendEmail = async ({
+export const sendEmail = async ({ to, subject, html }: SendEmailOptions) => {
+  await mailTransporter.sendMail({
     to,
     subject,
     html,
-}: SendEmailParams) => {
-    return resend.emails.send({
-    from: process.env.EMAIL_FROM!,
-    to,
-    subject,
-    html,
-});
-}
+  });
+};
