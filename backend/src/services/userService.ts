@@ -16,18 +16,24 @@ const userService = {
   },
 
   async getUserByEmail(email: string) {
-    return prisma.user.findUnique({ where: { email } });
+    return prisma.user.findFirst({ where: { email, deletedAt: null } });
   },
 
   async getUserById(userId: string) {
-    return prisma.user.findUnique({
-      where: { id: userId },
+    return prisma.user.findFirst({
+      where: {
+        id: userId,
+        deletedAt: null,
+      },
     });
   },
 
   async deleteUser(userId: string) {
-    return prisma.user.delete({
+    return prisma.user.update({
       where: { id: userId },
+      data: {
+        deletedAt: new Date(),
+      }
     });
   },
 
@@ -44,7 +50,9 @@ const userService = {
     }
 
     return prisma.user.update({
-      where: { id: userId },
+      where: {
+        id: userId,
+      },
       data,
     });
   },

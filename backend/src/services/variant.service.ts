@@ -4,14 +4,31 @@ const variantService = {
   // ----- PUBLIC ----
 
   async getVariantByProduct(productId: string) {
+    const product = await prisma.product.findFirst({
+      where: {
+        id : productId,
+        deletedAt: null,
+      },
+    });
+
+    if (!product) {
+      return [];
+    }
+    
     return prisma.variant.findMany({
-      where: { productId },
+      where: {
+        productId,
+        deletedAt: null,
+      },
     });
   },
 
   async getVariantById(variantId: string) {
-    return prisma.variant.findUnique({
-      where: { id: variantId },
+    return prisma.variant.findFirst({
+      where: {
+        id: variantId,
+        deletedAt: null,
+      },
     });
   },
 
@@ -38,14 +55,20 @@ const variantService = {
     }
   ) {
     return prisma.variant.update({
-      where: { id: variantId },
+      where: {
+        id: variantId,
+
+      },
       data,
     });
   },
 
   async deleteVariant(variantId: string) {
-    return prisma.variant.delete({
+    return prisma.variant.update({
       where: { id: variantId },
+      data: {
+        deletedAt: new Date(),
+      }
     });
   },
 };

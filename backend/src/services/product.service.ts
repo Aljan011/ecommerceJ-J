@@ -5,6 +5,9 @@ const productService = {
 
   async getAllProducts() {
     return prisma.product.findMany({
+      where: {
+        deletedAt: null,
+      },
       include: {
         variants: {
           select: { id: true, name: true, price: true, stock: true },
@@ -16,8 +19,11 @@ const productService = {
   },
 
   async getProductById(productId: string) {
-    return prisma.product.findUnique({
-      where: { id: productId },
+    return prisma.product.findFirst({
+      where: {
+        id: productId,
+        deletedAt: null,
+      },
       include: {
         variants: {
           select: { id: true, name: true, price: true, stock: true },
@@ -29,7 +35,10 @@ const productService = {
 
   async getProductsByCategory(categoryId: string) {
     return prisma.product.findMany({
-      where: { categoryId },
+      where: {
+        categoryId,
+        deletedAt: null,
+      },
       include: {
         variants: {
           select: { id: true, name: true, price: true, stock: true },
@@ -68,7 +77,9 @@ const productService = {
     }
   ) {
     return prisma.product.update({
-      where: { id: productId },
+      where: {
+        id: productId,
+      },
       data,
       include: {
         variants: {
@@ -80,11 +91,25 @@ const productService = {
   },
 
   async deleteProduct(productId: string) {
-    // Cascade delete variants handled by Prisma if relation is set
-    return prisma.product.delete({
-      where: { id: productId },
-    });
+    return prisma.$transaction([
+      prisma.product.update({
+        where: { id: productId },
+        data: {
+          deletedAt: new Date(),
+        },
+      }),
+
+      prisma.variant.updateMany({
+        where: {
+          productId,
+          deletedAt: null,
+        },
+        data: {
+          deletedAt: new Date(),
+        },
+      }),
+    ]);
   },
-};
+}
 
 export default productService;
