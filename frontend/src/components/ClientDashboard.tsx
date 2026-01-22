@@ -1,5 +1,7 @@
 "use client";
 
+import CategoryList from "./category/CategoryList";
+
 export const ClientDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-900 dark:to-indigo-950">
@@ -115,6 +117,11 @@ export const ClientDashboard = () => {
               Enjoy competitive prices and great deals on all products.
             </p>
           </div>
+        </div>
+
+        <div className="p-6">
+          <h1 className="mb-4 text-xl font-semibold">Categories</h1>
+          <CategoryList />
         </div>
       </div>
 
