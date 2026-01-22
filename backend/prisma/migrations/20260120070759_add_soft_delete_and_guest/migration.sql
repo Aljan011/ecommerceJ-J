@@ -1,0 +1,137 @@
+/*
+  WARNINGS FIXED:
+  - All required updatedAt columns now have DEFAULT CURRENT_TIMESTAMP
+  - Safe for existing rows
+*/
+
+-- DropForeignKey
+ALTER TABLE "CartHistory" DROP CONSTRAINT "CartHistory_orderId_fkey";
+ALTER TABLE "CartHistory" DROP CONSTRAINT "CartHistory_userId_fkey";
+ALTER TABLE "CartHistoryItem" DROP CONSTRAINT "CartHistoryItem_cartHistoryId_fkey";
+ALTER TABLE "CartHistoryItem" DROP CONSTRAINT "CartHistoryItem_variantId_fkey";
+ALTER TABLE "CartItem" DROP CONSTRAINT "CartItem_userId_fkey";
+ALTER TABLE "CartItem" DROP CONSTRAINT "CartItem_variantId_fkey";
+ALTER TABLE "Order" DROP CONSTRAINT "Order_userId_fkey";
+ALTER TABLE "OrderItem" DROP CONSTRAINT "OrderItem_orderId_fkey";
+ALTER TABLE "OrderItem" DROP CONSTRAINT "OrderItem_variantId_fkey";
+ALTER TABLE "Product" DROP CONSTRAINT "Product_categoryId_fkey";
+ALTER TABLE "Variant" DROP CONSTRAINT "Variant_productId_fkey";
+
+-- =====================
+-- ALTER TABLES
+-- =====================
+
+ALTER TABLE "CartHistory"
+ADD COLUMN "deletedAt" TIMESTAMP(3),
+ADD COLUMN "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ALTER COLUMN "userId" DROP NOT NULL;
+
+ALTER TABLE "CartHistoryItem"
+ADD COLUMN "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN "deletedAt" TIMESTAMP(3),
+ADD COLUMN "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE "CartItem"
+DROP COLUMN "addedAt",
+ADD COLUMN "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN "deletedAt" TIMESTAMP(3),
+ADD COLUMN "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE "Category"
+ADD COLUMN "deletedAt" TIMESTAMP(3),
+ADD COLUMN "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE "Order"
+ADD COLUMN "deletedAt" TIMESTAMP(3),
+ADD COLUMN "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ALTER COLUMN "userId" DROP NOT NULL;
+
+ALTER TABLE "OrderItem"
+ADD COLUMN "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN "deletedAt" TIMESTAMP(3),
+ADD COLUMN "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE "Product"
+ADD COLUMN "deletedAt" TIMESTAMP(3);
+
+ALTER TABLE "User"
+ADD COLUMN "deletedAt" TIMESTAMP(3);
+
+ALTER TABLE "Variant"
+ADD COLUMN "deletedAt" TIMESTAMP(3);
+
+-- =====================
+-- GUEST USER
+-- =====================
+
+CREATE TABLE "GuestUser" (
+  "id" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" TIMESTAMP(3),
+  CONSTRAINT "GuestUser_pkey" PRIMARY KEY ("id")
+);
+
+-- =====================
+-- FOREIGN KEYS (CASCADE)
+-- =====================
+
+ALTER TABLE "Product"
+ADD CONSTRAINT "Product_categoryId_fkey"
+FOREIGN KEY ("categoryId") REFERENCES "Category"("id")
+ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Variant"
+ADD CONSTRAINT "Variant_productId_fkey"
+FOREIGN KEY ("productId") REFERENCES "Product"("id")
+ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "CartItem"
+ADD CONSTRAINT "CartItem_userId_fkey"
+FOREIGN KEY ("userId") REFERENCES "User"("id")
+ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "CartItem"
+ADD CONSTRAINT "CartItem_guestId_fkey"
+FOREIGN KEY ("guestId") REFERENCES "GuestUser"("id")
+ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "CartItem"
+ADD CONSTRAINT "CartItem_variantId_fkey"
+FOREIGN KEY ("variantId") REFERENCES "Variant"("id")
+ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "CartHistory"
+ADD CONSTRAINT "CartHistory_userId_fkey"
+FOREIGN KEY ("userId") REFERENCES "User"("id")
+ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "CartHistory"
+ADD CONSTRAINT "CartHistory_orderId_fkey"
+FOREIGN KEY ("orderId") REFERENCES "Order"("id")
+ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "CartHistoryItem"
+ADD CONSTRAINT "CartHistoryItem_cartHistoryId_fkey"
+FOREIGN KEY ("cartHistoryId") REFERENCES "CartHistory"("id")
+ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "CartHistoryItem"
+ADD CONSTRAINT "CartHistoryItem_variantId_fkey"
+FOREIGN KEY ("variantId") REFERENCES "Variant"("id")
+ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Order"
+ADD CONSTRAINT "Order_userId_fkey"
+FOREIGN KEY ("userId") REFERENCES "User"("id")
+ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "OrderItem"
+ADD CONSTRAINT "OrderItem_orderId_fkey"
+FOREIGN KEY ("orderId") REFERENCES "Order"("id")
+ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "OrderItem"
+ADD CONSTRAINT "OrderItem_variantId_fkey"
+FOREIGN KEY ("variantId") REFERENCES "Variant"("id")
+ON DELETE CASCADE ON UPDATE CASCADE;
