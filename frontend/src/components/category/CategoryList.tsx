@@ -1,31 +1,57 @@
+"use client";
+
+import Image from "next/image";
 import Link from "next/link";
 import { useCategoryListQuery } from "@/lib";
-import "@/app/styles/clientDashboard/categorylisting.css"; 
+import type { ICategory } from "@/types";
 
-export default function CategoryList() {
-  const { data, isLoading, isError } = useCategoryListQuery();
+import "@/styles/ClientDashboard/OurServices/index.css"
+
+export default function CategoryProductList() {
+  const { data: categories, isLoading } = useCategoryListQuery();
 
   if (isLoading) {
-    return <p className="category-loading">Loading categories</p>;
-  }
-
-  if (isError) {
-    return <p className="category-error">Failed to load categories</p>;
+    return <p className="hm-loading">Loading categories...</p>;
   }
 
   return (
-    <ul className="category-list">
-      {data?.map((category) => (
-        <li key={category.id} className="category-item">
-          <Link
-            href={`/categories/${category.id}`}
-            className="category-link"
-          >
-            <span className="category-name">{category.name}</span>
-            <span className="category-description">{category.description}</span>
-          </Link>
-        </li>
-      ))}
-    </ul>
+    <section className="hm-products">
+      <div className="hm-container">
+        <h2 className="hm-section-title">Our Services</h2>
+
+        <div className="hm-products-grid">
+          {categories?.map((category) => (
+            <div key={category.id} className="hm-product-category">
+              <div className="hm-category-image">
+                <Image
+                  src={category.imageUrl }
+                  alt={category.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="hm-category-img"
+                />
+              </div>
+
+              <div className="hm-category-content">
+                <h3 className="hm-category-title">
+                  {category.name}
+                </h3>
+
+                <p className="hm-category-desc">
+                  {category.description}
+                </p>
+
+                <Link
+                  href={`/categories/${category.id}`}
+                  className="hm-category-link"
+                >
+                  View Products
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

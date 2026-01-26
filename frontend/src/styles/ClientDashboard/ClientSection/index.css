@@ -1,0 +1,158 @@
+/* Clients Section */
+.hm-clients {
+          padding: 4rem 0;
+          background-color: #f9fafb;
+          overflow: hidden;
+        }
+
+        .hm-clients__container {
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 0 1rem;
+        }
+
+        .hm-clients__header {
+          text-align: center;
+          margin-bottom: 3rem;
+        }
+
+        .hm-clients__title {
+          font-size: 50px;
+          font-weight: bold;
+          color: #4a9b5e;
+          margin-bottom: 1rem;
+        }
+
+        .hm-clients__subtitle {
+          font-size: 20px;
+          color: #6b7280;
+        }
+
+        .hm-clients__showcase {
+          position: relative;
+        }
+
+        .hm-clients__row {
+          display: flex;
+          overflow: hidden;
+          margin-bottom: 2rem;
+        }
+
+        .hm-clients__row:last-of-type {
+          margin-bottom: 0;
+        }
+
+        .hm-clients__track {
+          display: flex;
+        }
+
+        .hm-clients__track--right {
+          animation: hm-slide-right 30s linear infinite;
+        }
+
+        .hm-clients__track--left {
+          animation: hm-slide-left 30s linear infinite;
+        }
+
+        .hm-clients__track:hover {
+          animation-play-state: paused;
+        }
+
+        .hm-clients__card {
+          flex-shrink: 0;
+          width: 200px;
+          height: 100px;
+          margin: 0 2rem;
+          background: white;
+          border-radius: 0.5rem;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+          padding: 1.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .hm-clients__card-content {
+          text-align: center;
+        }
+
+        .hm-clients__logo {
+          width: 4rem;
+          height: 4rem;
+          margin: 0 auto 0.5rem;
+          background-color: #e5e7eb;
+          border-radius: 0.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .hm-clients__logo-text {
+          color: #6b7280;
+          font-size: 0.75rem;
+          font-weight: 500;
+        }
+
+        .hm-clients__name {
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #374151;
+        }
+
+        .hm-clients__fade {
+          position: absolute;
+          top: 0;
+          width: 8rem;
+          height: 100%;
+          z-index: 10;
+          pointer-events: none;
+        }
+
+        .hm-clients__fade--left {
+          left: 0;
+          background: linear-gradient(to right, #f9fafb, transparent);
+        }
+
+        .hm-clients__fade--right {
+          right: 0;
+          background: linear-gradient(to left, #f9fafb, transparent);
+        }
+
+        @keyframes hm-slide-right {
+          from {
+            transform: translateX(-100%);
+          }
+          to {
+            transform: translateX(0%);
+          }
+        }
+
+        @keyframes hm-slide-left {
+          from {
+            transform: translateX(0%);
+          }
+          to {
+            transform: translateX(-100%);
+          }
+        }
+
+        @media (max-width: 640px) {
+          .hm-clients {
+            padding: 2rem 0;
+          }
+          
+          .hm-clients__container {
+            padding: 0 0.5rem;
+          }
+          
+          .hm-clients__title {
+            font-size: 1.5rem;
+          }
+          
+          .hm-clients__card {
+            width: 160px;
+            height: 80px;
+            margin: 0 1rem;
+            padding: 1rem;
+          }
+        }

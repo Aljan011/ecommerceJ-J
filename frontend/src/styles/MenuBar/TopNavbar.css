@@ -1,0 +1,323 @@
+
+/* ---------- TOP BAR ---------- */
+.layout-topbar {
+  background-color: #4CAF50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;   
+  padding: 5px 40px;       
+  font-size: 15px;
+  color: white;
+  height: 40px;         
+  position: static;       
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.layout-topbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.layout-topbar-item {
+  display: flex;
+  align-items: center;
+  color: white;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+.layout-topbar-item:hover {
+  opacity: 0.9;
+}
+
+.layout-topbar-item span {
+  margin-left: 4px;
+}
+
+.layout-topbar-separator {
+  margin: 0 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.layout-topbar-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Social icons */
+.social-icon {
+  color: white;
+  font-size: 20px; 
+  margin-left: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.social-icon:hover {
+  opacity: 0.8;
+  transform: scale(1.1); 
+}
+
+/* Remove background */
+.social-icon.fb,
+.social-icon.tw,
+.social-icon.ln,
+.social-icon.pt,
+.social-icon.yt {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Catalogue button */
+.catalogue-btn {
+  background-color: #FF5722;
+  color: white;
+  padding: 4px 10px;       
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 13px;         
+  margin-left: 10px;
+  height: 35px;           
+  line-height: 28px;             
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+
+.catalogue-btn .catalogue-btn-name {
+  margin-left: 6px;
+}
+
+.catalogue-btn:hover {
+  background-color: #E64A19;
+}
+
+.catalogue-icon {
+  margin-right: 4px;
+  font-size: 16px;
+}
+
+/* ---------- NAV BAR ---------- */
+.layout-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 40px;
+  background: white;
+  height: 80px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0; /* Position at top since topbar is not fixed on desktop */
+  z-index: 999;
+
+  /* animation setup */
+  transition: all 0.3s ease;
+}
+
+.layout-navbar, 
+.layout-navbar * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
+
+.layout-navbar.scrolled {
+  height: 65px; /* shrink a bit */
+  background: #f9f9f9; 
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+.layout-navbar-logo {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 25px;
+  color: #4CAF50;
+}
+
+.logo-icon {
+  width: 70px;
+  height: 55px;
+  margin-right: 8px;
+  background: linear-gradient(135deg, #FF9800, #4CAF50);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.layout-navbar-links {
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+}
+
+.layout-navbar-links a {
+  color: #4CAF50;
+  margin-left: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 25px;
+  letter-spacing: 0.3px;
+}
+
+.layout-navbar-links a:hover {
+  color: #388E3C;
+}
+
+.layout-navbar-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: #4CAF50;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* --- Responsive: Mobile styles --- */
+@media (max-width: 768px) {
+  /* ---------- TOP BAR ---------- */
+  .layout-topbar {
+    padding: 2px 10px;         /* Decreased padding for smaller height */
+    height: 30px;              /* Smaller height */
+    font-size: 11px;
+    flex-direction: row;       /* Keep items in a row */
+    justify-content: center;   /* Center items */
+    align-items: center;
+    gap: 5px;                  /* Small gap between items */
+    position: sticky;          /* Sticky to top */
+    top: 0;
+    z-index: 1000;
+    background-color: #4CAF50;
+  }
+
+  /* Only show phone and main info, hide social icons and catalogue */
+  .social-icon,
+  .catalogue-btn {
+    display: none;
+  }
+
+  /* Keep separator between main and phone */
+  .layout-topbar-separator {
+    display: inline-block;
+    width: 1px;
+    height: 14px;
+    background-color: rgba(255, 255, 255, 0.7);
+    margin: 0 6px;
+  }
+
+  .layout-topbar-item:not(.social-icon):not(.catalogue-btn) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ---------- NAV BAR ---------- */
+  .layout-navbar {
+    padding: 20px 15px;        /* Increased padding for taller nav */
+    height: 70px;              /* Increased height */
+    position: sticky;
+    top: 30px;                 /* Stick below the top bar */
+    z-index: 999;
+    background-color: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .layout-navbar-logo {
+    font-size: 20px;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .layout-navbar-hamburger {
+    display: block;
+  }
+
+  .layout-navbar-links {
+    display: none;
+    flex-direction: column;
+    background-color: white;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    border-top: 1px solid #eee;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 998;
+  }
+
+  .layout-navbar-links.open {
+    display: flex;
+  }
+
+  .layout-navbar-links a {
+    margin: 0;
+    padding: 18px 20px;       /* Slightly larger padding for taller nav items */
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+  }
+
+  .layout-navbar-links a:last-child {
+    border-bottom: none;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .layout-topbar {
+    padding: 2px 8px;
+    height: 28px;
+    font-size: 10px;
+  }
+
+  .layout-navbar {
+    padding: 18px 10px;
+    height: 65px;
+    top: 28px; /* Adjust based on topbar height */
+  }
+
+  .layout-navbar-logo {
+    font-size: 18px;
+  }
+}
+
+/* Desktop - Static topbar, sticky navbar */
+@media (min-width: 769px) {
+  .layout-topbar {
+    position: static;      /* CHANGED: Static position for desktop */
+    background-color: #4CAF50;
+    height: 40px;          
+    padding: 5px 40px; 
+  }
+
+  .layout-navbar {
+    position: sticky;      /* Keep sticky behavior */
+    top: 0;                        
+    z-index: 999;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    height: 80px;            
+    padding: 15px 40px;
+  }
+}
+
+

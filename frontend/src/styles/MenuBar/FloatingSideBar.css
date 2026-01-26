@@ -1,0 +1,177 @@
+/* Floating Sidebar */
+.hm-floating-sidebar {
+  position: fixed;
+  right: 0;                     
+  top: 50%;                     
+  transform: translateY(-50%);  
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 9999;
+}
+
+.hm-floating-sidebar.hm-minimized {
+  transform:  translate(120%, -50%);
+}
+
+/* Toggle Button */
+.hm-sidebar-toggle-btn {
+  position: fixed;
+  right: 0;
+  bottom: 30px; /* ⬅ always below the sidebar */
+   top: 70%; 
+  transform: translateY(-50%);
+  z-index: 1001;
+  width: 35px;
+  height: 45px;
+  background: #28a745;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 8px rgba(0,0,0,0.15);
+}
+
+.hm-sidebar-toggle-btn:hover {
+  background: #218838;
+}
+
+/* Sidebar Buttons */
+.hm-sidebar-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 6px 0 0 6px;
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+  transition: all 0.25s ease;
+}
+
+.hm-cart-btn {
+  background-color: #ffd43b; 
+  color: #000;
+}
+
+.hm-sidebar-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.hm-sidebar-btn:hover svg {
+  transform: scale(1.1);
+}
+
+.hm-phone-btn {
+  background: #25d366;
+}
+.hm-phone-btn:hover {
+  background: #128c7e;
+}
+
+.hm-email-btn {
+  background: #34a853;
+}
+.hm-email-btn:hover {
+  background: #2d8f47;
+}
+
+.hm-scroll-top-btn {
+  background: #4285f4;
+}
+.hm-scroll-top-btn:hover {
+  background: #3367d6;
+}
+
+/* Animation */
+@keyframes hm-slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Responsive - Mobile Bottom Bar */
+@media (max-width: 768px) {
+  .hm-floating-sidebar {
+    /* Position at bottom of screen */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    
+    /* Transform to horizontal layout */
+    transform: none;
+    width: 100%;
+    height: auto;
+    
+    /* Flex layout for horizontal buttons with bigger gaps */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    gap: 40px; /* Bigger gap between buttons */
+    
+    /* Styling */
+    background: #ff6b35; /* Orange background like in screenshot 2 */
+    padding: 12px 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  }
+  
+  .hm-floating-sidebar.hm-minimized {
+    /* Remove minimized functionality - always show */
+    transform: none;
+  }
+  
+  .hm-sidebar-btn {
+    /* Horizontal button layout */
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    transition: all 0.3s ease;
+  }
+  
+  .hm-sidebar-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .hm-sidebar-toggle-btn {
+    /* Completely hide the toggle button */
+    display: none !important;
+  }
+  
+  /* Optional: Add some bottom padding to body to prevent content overlap */
+  body {
+    padding-bottom: 70px;
+  }
+}
+
+/* Alternative version with even distribution across full width */
+@media (max-width: 768px) {
+  .hm-floating-sidebar.full-width-distribution {
+    justify-content: space-evenly;
+    padding: 12px 20px;
+  }
+  
+  .hm-floating-sidebar.full-width-distribution .hm-sidebar-btn {
+    margin: 0;
+    flex: 1;
+    max-width: 60px;
+  }
+}
