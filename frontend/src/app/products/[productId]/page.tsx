@@ -4,10 +4,11 @@ interface Props {
     params: {productId: string};
 }
 
-export default function ProductPage({ params }: Props) {
+export default async function ProductPage({ params }: Props) {
+    const { productId } = await params;
   return (
     <main className="p-6">
-      <ProductDetail productId={params.productId} />
+      <ProductDetail productId={productId} />
     </main>
   );
 }

@@ -14,90 +14,175 @@ async function main() {
   const adminPassword = await bcrypt.hash("admin123", 10);
   const userPassword = await bcrypt.hash("user123", 10);
 
-  const admin = await prisma.user.upsert({
-    where: { email: "admin@jnj.com" },
+  await prisma.user.upsert({
+    where: { email: "admin@demo.com" },
     update: {},
     create: {
       name: "Admin",
-      email: "admin@jnj.com",
+      email: "admin@demo.com",
       password: adminPassword,
       role: "ADMIN",
     },
   });
 
-  const user = await prisma.user.upsert({
-    where: { email: "user@jnj.com" },
+  await prisma.user.upsert({
+    where: { email: "user@demo.com" },
     update: {},
     create: {
-      name: "Normal User",
-      email: "user@jnj.com",
+      name: "User",
+      email: "user@demo.com",
       password: userPassword,
       role: "USER",
     },
   });
 
   // --------------------
-  // CATEGORIES
+  // CATEGORIES (ALL NEW)
   // --------------------
   await prisma.category.createMany({
     data: [
-      { name: "Electronics", description: "Electronic gadgets and devices" },
-      { name: "Clothing", description: "Fashion and apparel" },
-      { name: "Home", description: "Home and kitchen products" },
+      { name: "Books", description: "Books and educational material" },
+      { name: "Furniture", description: "Home and office furniture" },
+      { name: "Sports", description: "Sports and fitness equipment" },
+      { name: "Beauty", description: "Beauty and personal care" },
     ],
+    skipDuplicates: true,
   });
 
-  // Fetch categories to link products
-  const allCategories = await prisma.category.findMany();
-  const electronics = allCategories.find(c => c.name === "Electronics")!;
-  const clothing = allCategories.find(c => c.name === "Clothing")!;
+  const categories = await prisma.category.findMany();
+
+  const books = categories.find(c => c.name === "Books")!;
+  const furniture = categories.find(c => c.name === "Furniture")!;
+  const sports = categories.find(c => c.name === "Sports")!;
+  const beauty = categories.find(c => c.name === "Beauty")!;
 
   // --------------------
-  // PRODUCTS + VARIANTS
+  // BOOKS
   // --------------------
-  // Electronics
-  const smartphone = await prisma.product.create({
+  await prisma.product.create({
     data: {
-      name: "Smartphone",
-      description: "Latest smartphone",
-      imageUrl: "https://example.com/smartphone.jpg",
-      categoryId: electronics.id,
+      name: "JavaScript Mastery",
+      description: "Complete guide to JavaScript",
+      imageUrl: "https://example.com/js-book.jpg",
+      categoryId: books.id,
       variants: {
         create: [
-          { name: "128GB - Black", price: 699.99, stock: 50 },
-          { name: "256GB - Black", price: 799.99, stock: 30 },
+          { name: "Paperback", price: 29.99, stock: 100 },
+          { name: "Hardcover", price: 39.99, stock: 60 },
         ],
       },
     },
   });
 
-  const laptop = await prisma.product.create({
+  await prisma.product.create({
     data: {
-      name: "Laptop",
-      description: "High performance laptop",
-      imageUrl: "https://example.com/laptop.jpg",
-      categoryId: electronics.id,
+      name: "Clean Architecture",
+      description: "Software architecture principles",
+      imageUrl: "https://example.com/architecture.jpg",
+      categoryId: books.id,
       variants: {
         create: [
-          { name: "i5 - 8GB RAM", price: 1299.99, stock: 30 },
-          { name: "i7 - 16GB RAM", price: 1599.99, stock: 20 },
+          { name: "Paperback", price: 34.99, stock: 80 },
+          { name: "Hardcover", price: 44.99, stock: 40 },
         ],
       },
     },
   });
 
-  // Clothing
-  const tshirt = await prisma.product.create({
+  // --------------------
+  // FURNITURE
+  // --------------------
+  await prisma.product.create({
     data: {
-      name: "T-Shirt",
-      description: "Cotton T-Shirt",
-      imageUrl: "https://example.com/tshirt.jpg",
-      categoryId: clothing.id,
+      name: "Office Chair",
+      description: "Ergonomic office chair",
+      imageUrl: "https://example.com/chair.jpg",
+      categoryId: furniture.id,
       variants: {
         create: [
-          { name: "Small - Red", price: 19.99, stock: 40 },
-          { name: "Medium - Blue", price: 19.99, stock: 60 },
-          { name: "Large - Black", price: 21.99, stock: 30 },
+          { name: "Black", price: 149.99, stock: 30 },
+          { name: "Grey", price: 149.99, stock: 25 },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      name: "Study Desk",
+      description: "Wooden study desk",
+      imageUrl: "https://example.com/desk.jpg",
+      categoryId: furniture.id,
+      variants: {
+        create: [
+          { name: "120cm", price: 199.99, stock: 20 },
+          { name: "150cm", price: 249.99, stock: 15 },
+        ],
+      },
+    },
+  });
+
+  // --------------------
+  // SPORTS
+  // --------------------
+  await prisma.product.create({
+    data: {
+      name: "Yoga Mat",
+      description: "Non-slip yoga mat",
+      imageUrl: "https://example.com/yoga.jpg",
+      categoryId: sports.id,
+      variants: {
+        create: [
+          { name: "6mm", price: 29.99, stock: 50 },
+          { name: "8mm", price: 34.99, stock: 40 },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      name: "Dumbbell Set",
+      description: "Adjustable dumbbells",
+      imageUrl: "https://example.com/dumbbell.jpg",
+      categoryId: sports.id,
+      variants: {
+        create: [
+          { name: "20kg", price: 79.99, stock: 25 },
+          { name: "30kg", price: 109.99, stock: 15 },
+        ],
+      },
+    },
+  });
+
+  // --------------------
+  // BEAUTY
+  // --------------------
+  await prisma.product.create({
+    data: {
+      name: "Face Cleanser",
+      description: "Gentle daily face cleanser",
+      imageUrl: "https://example.com/cleanser.jpg",
+      categoryId: beauty.id,
+      variants: {
+        create: [
+          { name: "100ml", price: 14.99, stock: 60 },
+          { name: "200ml", price: 22.99, stock: 40 },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      name: "Moisturizer",
+      description: "Hydrating skin moisturizer",
+      imageUrl: "https://example.com/moisturizer.jpg",
+      categoryId: beauty.id,
+      variants: {
+        create: [
+          { name: "Normal Skin", price: 19.99, stock: 50 },
+          { name: "Dry Skin", price: 21.99, stock: 45 },
         ],
       },
     },

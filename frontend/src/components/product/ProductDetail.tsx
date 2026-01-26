@@ -1,45 +1,62 @@
+"use client"
+
 import { useProductByIdQuery } from "@/lib";
+import "@/app/styles/clientDashboard/productdetails.css"
 
 interface Props {
-    productId: string;
+  productId: string;
 }
 
 export default function ProductDetail({ productId }: Props) {
   const { data: product, isLoading, isError } =
     useProductByIdQuery(productId);
 
-  if (isLoading) return <p>Loading product...</p>;
-  if (isError || !product) return <p>Failed to load product</p>;
+  if (isLoading) return <p className="product-loading">Loading product</p>;
+  if (isError || !product) return <p className="product-error">Failed to load product</p>;
 
   return (
-    <div className="space-y-4 p-6 border rounded">
-      <h1 className="text-2xl font-bold">{product.name}</h1>
+    <div className="product-detail-container">
+      <div className="product-detail-card">
+        <div className="product-header">
+          <h1 className="product-title">{product.name}</h1>
 
-      {product.description && (
-        <p className="text-gray-700">{product.description}</p>
-      )}
+          {product.description && (
+            <p className="product-description">{product.description}</p>
+          )}
+        </div>
 
-      <div className="mt-4 space-y-2">
-        <h2 className="font-semibold">Variants</h2>
-        {product.variants.length === 0 && <p>No variants available</p>}
-        {product.variants.map((variant) => (
-          <div
-            key={variant.id}
-            className="rounded bg-gray-50 p-2 text-sm border"
-          >
-            <p>Price: ${variant.price}</p>
-            <p>Stock: {variant.stock}</p>
-             {/* {variant.attributes && (
-              <div className="text-xs text-gray-500">
-                {Object.entries(variant.attributes).map(([key, value]) => (
-                  <span key={key} className="mr-2">
-                    {key}: {value} 
-                  </span>
-                ))}
-              </div>
-            )} */}
-          </div>
-        ))}
+        <div className="variants-section">
+          <h2 className="variants-title">Available Variants</h2>
+
+          {product.variants.length === 0 && (
+            <p className="variants-empty">No variants available</p>
+          )}
+
+          {product.variants.length > 0 && (
+            <div className="variants-grid">
+              {product.variants.map((variant) => {
+                const stockStatus = variant.stock > 10 ? 'in-stock' :
+                  variant.stock > 0 ? 'low-stock' :
+                    'out-of-stock';
+
+                return (
+                  <div
+                    key={variant.id}
+                    className="variant-card"
+                  >
+                    <div className="variant-info">
+                      <p className="variant-price">{variant.price}</p>
+                      <p className="variant-stock">
+                        <span className={`stock-indicator ${stockStatus}`}></span>
+                        <span>Stock: <strong>{variant.stock}</strong></span>
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

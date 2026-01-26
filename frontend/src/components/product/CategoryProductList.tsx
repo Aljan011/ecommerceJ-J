@@ -2,49 +2,55 @@
 
 import Link from "next/link";
 import { useCategoryProductsQuery } from "@/lib";
+import "@/app/styles/clientDashboard/categoryproductlist.css"; 
 
 interface Props {
   categoryId: string;
 }
 
 export default function CategoryProductList({ categoryId }: Props) {
+  console.log("categoryid", categoryId)
+
   const { data, isLoading, isError } =
     useCategoryProductsQuery(categoryId);
 
+  console.log("category products data", data);
+
   if (isLoading) {
-    return <p>Loading products...</p>;
+    return <p className="products-loading">Loading products</p>;
   }
 
   if (isError) {
-    return <p>Failed to load products</p>;
+    return <p className="products-error">Failed to load products</p>;
   }
 
   if (!data || data.length === 0) {
-    return <p>No products in this category</p>;
+    return <p className="products-empty">No products in this category</p>;
   }
 
   return (
-    <ul className="space-y-3">
+    <ul className="products-list">
       {data.map((product) => (
         <li
           key={product.id}
-          className="rounded border p-4"
+          className="product-item"
         >
-          <h2 className="font-medium">{product.name}</h2>
+          <div className="product-card">
+            <h2 className="product-name">{product.name}</h2>
 
-          {product.description && (
-            <p className="text-sm text-gray-600">
-              {product.description}
-            </p>
-          )}
+            {product.description && (
+              <p className="product-description">
+                {product.description}
+              </p>
+            )}
 
-          {/* Product detail navigation (NEXT STEP) */}
-          <Link
-            href={`/products/${product.id}`}
-            className="mt-2 inline-block text-sm text-blue-600 hover:underline"
-          >
-            View product
-          </Link>
+            <Link
+              href={`/products/${product.id}`}
+              className="product-link"
+            >
+              View product
+            </Link>
+          </div>
         </li>
       ))}
     </ul>

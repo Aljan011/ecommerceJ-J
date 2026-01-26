@@ -6,14 +6,16 @@ interface Props {
   };
 }
 
-export default function CategoryPage({ params }: Props) {
+export default async function CategoryPage({ params }: Props) {
+    const { categoryId } = await params;
   return (
     <main className="p-6">
       <h1 className="mb-4 text-xl font-semibold">
         Products
       </h1>
 
-      <CategoryProductList categoryId={params.categoryId} />
+      <CategoryProductList categoryId={categoryId} />
     </main>
   );
 }
+

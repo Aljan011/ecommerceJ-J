@@ -1,27 +1,28 @@
 import Link from "next/link";
 import { useCategoryListQuery } from "@/lib";
+import "@/app/styles/clientDashboard/categorylisting.css"; 
 
 export default function CategoryList() {
   const { data, isLoading, isError } = useCategoryListQuery();
 
   if (isLoading) {
-    return <p>Loading categories...</p>;
+    return <p className="category-loading">Loading categories</p>;
   }
 
   if (isError) {
-    return <p>Failed to load categories</p>;
+    return <p className="category-error">Failed to load categories</p>;
   }
 
   return (
-    <ul className="space-y-2">
+    <ul className="category-list">
       {data?.map((category) => (
-        <li key={category.id}>
+        <li key={category.id} className="category-item">
           <Link
             href={`/categories/${category.id}`}
-            className="block rounded border p-3 hover:bg-black-50"
+            className="category-link"
           >
-            <span className="font-medium">{category.name}</span>
-            <span className="font-normal">{category.description}</span>
+            <span className="category-name">{category.name}</span>
+            <span className="category-description">{category.description}</span>
           </Link>
         </li>
       ))}
