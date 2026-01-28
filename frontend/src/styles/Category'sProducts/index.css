@@ -1,0 +1,131 @@
+/* ===========================
+   CATEGORY PRODUCTS
+=========================== */
+
+.pb-products {
+  padding: 100px 0;
+  background: linear-gradient(135deg, #f1f2f6 0%, #dfe4ea 100%);
+}
+
+.pb-products-inner {
+  width: 90%;
+  max-width: 1350px;
+  margin: auto;
+}
+
+.pb-section-title {
+  text-align: center;
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin-bottom: 50px;
+  color: #2c3e50;
+}
+
+/* GRID */
+.pb-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+/* CARD */
+.pb-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: 0.4s ease;
+}
+
+.pb-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12);
+}
+
+/* IMAGE */
+.pb-card-image {
+  height: 240px;
+  overflow: hidden;
+}
+
+.pb-card-image img {
+  transition: 0.4s ease;
+}
+
+.pb-card:hover .pb-card-image img {
+  transform: scale(1.05);
+}
+
+/* BODY */
+.pb-card-body {
+  padding: 28px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.pb-card-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.pb-card-desc {
+  flex-grow: 1;
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+/* ACTIONS */
+.pb-card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pb-link {
+  font-weight: 600;
+  color: #27ae60;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.pb-link:hover {
+  transform: translateX(5px);
+  color: #229954;
+}
+
+.pb-cta {
+  background: #27ae60;
+  color: white;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 6px;
+}
+
+/* STATES */
+.products-loading,
+.products-error,
+.products-empty {
+  text-align: center;
+  padding: 80px 0;
+  font-size: 1.1rem;
+  color: #555;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  .pb-products-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .pb-card-image {
+    height: 180px;
+  }
+}

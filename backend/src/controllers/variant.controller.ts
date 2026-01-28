@@ -7,11 +7,10 @@ function getParamString(param: string | string[] | undefined, paramName: string)
   return param;
 }
 
-//----Public Controllers----//
+// ---- Public Controllers ----
 export const getVariants = async (req: Request, res: Response) => {
   try {
     const productId = getParamString(req.params.productId, "Product ID");
-
     const variants = await variantService.getVariantByProduct(productId);
     res.json(variants);
   } catch (err: any) {
@@ -24,30 +23,32 @@ export const getVariant = async (req: Request, res: Response) => {
     const variantId = getParamString(req.params.id, "Variant ID");
 
     const variant = await variantService.getVariantById(variantId);
-    if (!variant) return res.status(404).json({ message: "Variant not found" });
+    if (!variant) {
+      return res.status(404).json({ message: "Variant not found" });
+    }
+
     res.json(variant);
   } catch (err: any) {
     res.status(400).json({ message: err.message });
   }
 };
 
-//----Admin Controllers----//
+// ---- Admin Controllers ----
 export const createVariant = async (req: Request, res: Response) => {
   try {
-    const { productId, name, price, stock } = req.body;
+    const { productId, name } = req.body;
 
-    if (!productId || !name || price == null || stock == null) {
+    if (!productId || !name) {
       return res
         .status(400)
-        .json({ message: "Product ID, name, price, and stock are required" });
+        .json({ message: "Product ID and name are required" });
     }
 
     const variant = await variantService.createVariant({
       productId,
       name,
-      price,
-      stock,
     });
+
     res.status(201).json(variant);
   } catch (err: any) {
     res.status(400).json({ message: err.message });
@@ -58,7 +59,11 @@ export const updateVariant = async (req: Request, res: Response) => {
   try {
     const variantId = getParamString(req.params.id, "Variant ID");
 
-    const updatedVariant = await variantService.updateVariant(variantId, req.body);
+    const updatedVariant = await variantService.updateVariant(
+      variantId,
+      req.body
+    );
+
     res.json(updatedVariant);
   } catch (err: any) {
     res.status(400).json({ message: err.message });

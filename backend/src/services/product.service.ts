@@ -1,7 +1,9 @@
 import prisma from "../config/prisma.ts";
 
 const productService = {
-  // ----- PUBLIC -----
+  // =====================
+  // PUBLIC
+  // =====================
 
   async getAllProducts() {
     return prisma.product.findMany({
@@ -9,10 +11,18 @@ const productService = {
         deletedAt: null,
       },
       include: {
-        variants: {
-          select: { id: true, name: true, price: true, stock: true },
-        },
         category: true,
+        variants: {
+          where: { deletedAt: null },
+          include: {
+            colors: {
+              where: { deletedAt: null },
+              include: {
+                color: true, // name, hex
+              },
+            },
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
     });
@@ -25,10 +35,18 @@ const productService = {
         deletedAt: null,
       },
       include: {
-        variants: {
-          select: { id: true, name: true, price: true, stock: true },
-        },
         category: true,
+        variants: {
+          where: { deletedAt: null },
+          include: {
+            colors: {
+              where: { deletedAt: null },
+              include: {
+                color: true,
+              },
+            },
+          },
+        },
       },
     });
   },
@@ -40,15 +58,25 @@ const productService = {
         deletedAt: null,
       },
       include: {
-        variants: {
-          select: { id: true, name: true, price: true, stock: true },
-        },
         category: true,
+        variants: {
+          where: { deletedAt: null },
+          include: {
+            colors: {
+              where: { deletedAt: null },
+              include: {
+                color: true,
+              },
+            },
+          },
+        },
       },
     });
   },
 
-  // ----- ADMIN -----
+  // =====================
+  // ADMIN
+  // =====================
 
   async createProduct(data: {
     name: string;
@@ -59,10 +87,16 @@ const productService = {
     return prisma.product.create({
       data,
       include: {
-        variants: {
-          select: { id: true, name: true, price: true, stock: true },
-        },
         category: true,
+        variants: {
+          include: {
+            colors: {
+              include: {
+                color: true,
+              },
+            },
+          },
+        },
       },
     });
   },
@@ -77,15 +111,19 @@ const productService = {
     }
   ) {
     return prisma.product.update({
-      where: {
-        id: productId,
-      },
+      where: { id: productId },
       data,
       include: {
-        variants: {
-          select: { id: true, name: true, price: true, stock: true },
-        },
         category: true,
+        variants: {
+          include: {
+            colors: {
+              include: {
+                color: true,
+              },
+            },
+          },
+        },
       },
     });
   },
@@ -108,8 +146,20 @@ const productService = {
           deletedAt: new Date(),
         },
       }),
+
+      prisma.variantColor.updateMany({
+        where: {
+          variant: {
+            productId,
+          },
+          deletedAt: null,
+        },
+        data: {
+          deletedAt: new Date(),
+        },
+      }),
     ]);
   },
-}
+};
 
 export default productService;

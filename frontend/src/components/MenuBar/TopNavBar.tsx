@@ -2,32 +2,37 @@
 
 import { useEffect, useState } from "react";
 import { FaFacebook, FaInstagram, FaTiktok, FaLocationArrow } from "react-icons/fa";
-import { PiPhone as Phone} from "react-icons/pi";
+import { PiPhone as Phone } from "react-icons/pi";
 
 import "@/styles/MenuBar/TopNavbar.css";
 
+import { useCategoryListQuery } from "@/lib";
+import type { ICategory } from "@/types";
+
 function TopNavBar() {
-    const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-    const toggleMenu = () => 
-        setMenuOpen(!menuOpen);
+  const toggleMenu = () =>
+    setMenuOpen(!menuOpen);
 
-    const [scrolled, setScrolled] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-    useEffect(() => {
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 50); // when user scrolls more than 50px
-        };
+  const { data: categories } = useCategoryListQuery();
 
-        window.addEventListener("scroll", handleScroll);
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50); // when user scrolls more than 50px
+    };
 
-        return () => 
-            window.removeEventListener("scroll", handleScroll);
-        }, []);
+    window.addEventListener("scroll", handleScroll);
 
-         
+    return () =>
+      window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+
   return (
-   <>
+    <>
       {/* TOP BAR */}
       <div className="layout-topbar">
         <div className="layout-topbar-left">
@@ -98,10 +103,14 @@ function TopNavBar() {
         </button>
 
         <div className={`layout-navbar-links ${menuOpen ? 'open' : ''}`}>
-          <a href="/paper-bags">Categories</a>
+          
+          <a href="/categories">Products</a>
           <a href="/about">About Us</a>
-          <a href="/contact">CONTACT US</a>
+          <a href="/contact">Contact Us</a>
+
+          
         </div>
+
       </nav>
     </>
   );

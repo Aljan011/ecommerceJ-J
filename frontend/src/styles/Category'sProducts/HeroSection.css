@@ -1,0 +1,144 @@
+/* ===============================
+   HERO SECTION – BASE (DESKTOP)
+================================ */
+.pb-hero {
+  padding: 100px 0 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f9fafb;
+}
+
+.pb-hero-inner {
+  width: 90%;
+  max-width: 1250px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.pb-hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #2c3e50;
+  margin-bottom: 18px;
+}
+
+.pb-hero-sub {
+  font-size: 1.1rem;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  max-width: 520px;
+}
+
+.pb-hero-cta {
+  display: inline-block;
+  background: #27ae60;
+  color: white;
+  font-weight: 600;
+  padding: 12px 30px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.pb-hero-cta:hover {
+  background: #229954;
+  transform: translateY(-3px);
+}
+
+.pb-hero-img {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* ===============================
+   LARGE LAPTOPS (≤ 1200px)
+================================ */
+@media (max-width: 1200px) {
+  .pb-hero-inner {
+    gap: 40px;
+  }
+
+  .pb-hero-title {
+    font-size: 2.6rem;
+  }
+}
+
+/* ===============================
+   TABLETS / SMALL LAPTOPS (≤ 992px)
+================================ */
+@media (max-width: 992px) {
+  .pb-hero {
+    padding: 80px 0 60px;
+  }
+
+  .pb-hero-inner {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .pb-hero-sub {
+    margin: 0 auto 24px;
+  }
+
+  .pb-hero-img {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+/* ===============================
+   LARGE PHONES (≤ 768px)
+================================ */
+@media (max-width: 768px) {
+  .pb-hero {
+    padding: 70px 0 50px;
+  }
+
+  .pb-hero-title {
+    font-size: 2.2rem;
+  }
+
+  .pb-hero-sub {
+    font-size: 1rem;
+  }
+
+  .pb-hero-cta {
+    padding: 11px 26px;
+  }
+}
+
+/* ===============================
+   SMALL PHONES (≤ 480px)
+================================ */
+@media (max-width: 480px) {
+  .pb-hero {
+    padding: 60px 0 40px;
+  }
+
+  .pb-hero-title {
+    font-size: 1.85rem;
+  }
+
+  .pb-hero-sub {
+    font-size: 0.95rem;
+  }
+
+  .pb-hero-cta {
+    width: 100%;
+    text-align: center;
+    padding: 12px 0;
+  }
+}
+
+/* ===============================
+   EXTRA SMALL DEVICES (≤ 360px)
+================================ */
+@media (max-width: 360px) {
+  .pb-hero-title {
+    font-size: 1.6rem;
+  }
+}

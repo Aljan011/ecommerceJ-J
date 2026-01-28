@@ -12,6 +12,7 @@ import { cartRoutes } from "./routes/cart.routes.ts";
 import { orderRoutes } from "./routes/order.routes.ts";
 import { adminRoutes } from "./routes/admin.routes.ts";
 import { emailTestRoute } from "./emails/routes/emailTest.route.ts";
+import { variantColorRoutes } from "./routes/variantColor.routes.ts";
 
 const app = express();
 app.use(express.json());
@@ -22,6 +23,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/variants", variantRoutes);
+app.use("/api/variants-colors", variantColorRoutes)
 app.use("/api/cart", cartRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api", emailTestRoute)

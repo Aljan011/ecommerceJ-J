@@ -12,56 +12,60 @@ interface OrderInput {
   paymentMethod?: string;
   transactionId?: string;
 
-  //direct purchase item
+  // direct purchase items
   items?: {
-    variantId: string;
+    variantColorId: string;
     quantity: number;
     priceAtPurchase?: number;
   }[];
 }
 
 const orderService = {
-  async createOrder(context: OrderContext, orderData: OrderInput & { items?: { variantId: string; quantity: number; priceAtPurchase?: number }[] }) {
-    // 1. Fetch cart items
+  async createOrder(
+    context: OrderContext,
+    orderData: OrderInput
+  ) {
+    // 1️⃣ Fetch cart items
     let cartItems = await cartService.getCart(context);
 
-    // 2. If cart is empty, use direct order items
+    // 2️⃣ Direct purchase if cart is empty
     if ((!cartItems || cartItems.length === 0) && orderData.items) {
       cartItems = await Promise.all(
         orderData.items.map(async (item) => {
-          const variant = await prisma.variant.findUnique({
-            where: { id: item.variantId },
-            include: { product: { include: { category: true } } },
+          const variantColor = await prisma.variantColor.findUnique({
+            where: { id: item.variantColorId },
+            include: {
+              variant: { include: { product: { include: { category: true } } } },
+              color: true,
+            },
           });
-
-          if (!variant) throw new Error(`Variant ${item.variantId} not found`);
+          if (!variantColor) throw new Error(`VariantColor ${item.variantColorId} not found`);
+          if (variantColor.stock < item.quantity)
+            throw new Error(`Insufficient stock for ${variantColor.variant.name} (${variantColor.color.name})`);
 
           return {
-            id: "direct-" + item.variantId, // dummy id for direct purchase
-            variant,
+            id: "direct-" + item.variantColorId,
+            variantColor,
             quantity: item.quantity,
-            addedAt: new Date(),
-            priceAtPurchase: variant.price,
+            priceAtPurchase: variantColor.price,
             userId: "userId" in context ? context.userId : null,
             guestId: "guestId" in context ? context.guestId : null,
-            variantId: variant.id,
-          } as unknown as typeof cartItems[number]; // cast to satisfy TS
+            variantColorId: variantColor.id,
+          } as unknown as typeof cartItems[number];
         })
       );
     }
 
-    // 3. Still empty? throw error
-    if (!cartItems || cartItems.length === 0) {
+    if (!cartItems || cartItems.length === 0)
       throw new Error("No items to order");
-    }
 
-    // 4. Calculate total amount
+    // 3️⃣ Calculate total
     const totalAmount = cartItems.reduce(
       (sum, item) => sum + (item.priceAtPurchase ?? 0) * item.quantity,
       0
     );
 
-    // 5. Build order data
+    // 4️⃣ Create order
     const orderCreateData: any = {
       totalAmount,
       status: "PENDING",
@@ -75,69 +79,65 @@ const orderService = {
           ? new Date()
           : undefined,
     };
-
     if ("userId" in context) orderCreateData.userId = context.userId;
     if ("guestId" in context) orderCreateData.guestId = context.guestId;
 
-    // 6. Create order
     const order = await prisma.order.create({ data: orderCreateData });
 
-    // 7. Save cart history
+    // 5️⃣ Create cart history
     const cartHistoryData: any = {
       status: "ordered",
       orderId: order.id,
       userId: "userId" in context ? context.userId : undefined,
       guestId: "guestId" in context ? context.guestId : undefined,
     };
-
     const cartHistory = await prisma.cartHistory.create({ data: cartHistoryData });
 
-    // 8. Save cart history items
+    // 6️⃣ CartHistory items
     const cartHistoryItems = cartItems.map((item) => ({
       cartHistoryId: cartHistory.id,
-      variantId: item.variantId,
+      variantColorId: item.variantColorId,
       quantity: item.quantity,
       priceAtPurchase: item.priceAtPurchase!,
     }));
-
     await prisma.cartHistoryItem.createMany({ data: cartHistoryItems });
 
-    // 9. Create order items
+    // 7️⃣ Order items
     const orderItems = cartItems.map((item) => ({
       orderId: order.id,
-      variantId: item.variantId,
+      variantColorId: item.variantColorId,
       quantity: item.quantity,
       priceAtPurchase: item.priceAtPurchase!,
     }));
-
     await prisma.orderItem.createMany({ data: orderItems });
 
-    // 10. Decrement variant stock
+    // 8️⃣ Decrement stock
     for (const item of cartItems) {
-      await prisma.variant.update({
-        where: { id: item.variantId },
+      await prisma.variantColor.update({
+        where: { id: item.variantColorId },
         data: { stock: { decrement: item.quantity } },
       });
     }
 
-    // 11. Clear cart if it was a logged-in user or guest cart
+    // 9️⃣ Clear cart
     await cartService.clearCart(context);
 
     return order;
   },
 
   async getOrders(context: OrderContext) {
-    const whereClause =
-      "userId" in context
-        ? { userId: context.userId }
-        : { guestId: context.guestId };
-
+    const whereClause = "userId" in context ? { userId: context.userId } : { guestId: context.guestId };
     return prisma.order.findMany({
       where: whereClause,
       include: {
         items: {
           include: {
-            variant: { include: { product: true } },
+            variantColor: {
+              include: {
+                variant: { include: { product: { include: { category: true } } } },
+                color: true,
+              },
+            },
           },
         },
       },
@@ -149,38 +149,30 @@ const orderService = {
     const order = await prisma.order.findFirst({
       where: {
         id: orderId,
-        ...("userId" in context
-          ? { userId: context.userId }
-          : { guestId: context.guestId }),
+        ...("userId" in context ? { userId: context.userId } : { guestId: context.guestId }),
       },
       include: {
         items: {
-          include: { variant: { include: { product: true } } },
+          include: {
+            variantColor: {
+              include: {
+                variant: { include: { product: { include: { category: true } } } },
+                color: true,
+              },
+            },
+          },
         },
       },
     });
-
     if (!order) throw new Error("Order not found");
     return order;
   },
 
   async updateOrderStatus(orderId: string, status: string) {
-    const validStatuses = [
-      "PENDING",
-      "PAID",
-      "SHIPPED",
-      "DELIVERED",
-      "CANCELLED",
-    ];
+    const validStatuses = ["PENDING", "PAID", "SHIPPED", "DELIVERED", "CANCELLED"];
+    if (!validStatuses.includes(status)) throw new Error("Invalid status");
 
-    if (!validStatuses.includes(status)) {
-      throw new Error("Invalid status");
-    }
-
-    return prisma.order.update({
-      where: { id: orderId },
-      data: { status },
-    });
+    return prisma.order.update({ where: { id: orderId }, data: { status } });
   },
 };
 

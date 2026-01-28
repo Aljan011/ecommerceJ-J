@@ -24,7 +24,8 @@ export default function CategoryProductList() {
             <div key={category.id} className="hm-product-category">
               <div className="hm-category-image">
                 <Image
-                  src={category.imageUrl} 
+                  // src={category.imageUrl} // Uncomment and use actual image URL when available
+                  src="/placeholder-category.jpg" // Placeholder image
                   alt={category.name}
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"

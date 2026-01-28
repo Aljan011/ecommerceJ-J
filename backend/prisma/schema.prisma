@@ -77,13 +77,11 @@ model Product {
 }
 
 ///////////////////////
-// VARIANTS
+// VARIANTS (logical option only)
 ///////////////////////
 model Variant {
-  id    String @id @default(uuid())
-  name  String
-  price Float
-  stock Int    @default(0)
+  id   String @id @default(uuid())
+  name String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -92,9 +90,47 @@ model Variant {
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  colors VariantColor[]
+}
+
+///////////////////////
+// COLORS
+///////////////////////
+model Color {
+  id        String   @id @default(uuid())
+  name      String
+  hex       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  variants VariantColor[]
+}
+
+///////////////////////
+// VARIANT COLORS (SELLABLE SKU)
+///////////////////////
+model VariantColor {
+  id String @id @default(uuid())
+
+  price Float
+  stock Int @default(0)
+
+  variantId String
+  variant   Variant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  colorId String
+  color   Color @relation(fields: [colorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
   cartItems        CartItem[]
   orderItems       OrderItem[]
   cartHistoryItems CartHistoryItem[]
+
+  @@unique([variantId, colorId])
 }
 
 ///////////////////////
@@ -115,11 +151,11 @@ model CartItem {
   guestId String?
   guest   GuestUser? @relation(fields: [guestId], references: [id], onDelete: Cascade)
 
-  variantId String
-  variant   Variant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  variantColorId String
+  variantColor   VariantColor @relation(fields: [variantColorId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, variantId])
-  @@unique([guestId, variantId])
+  @@unique([userId, variantColorId])
+  @@unique([guestId, variantColorId])
 }
 
 ///////////////////////
@@ -156,8 +192,8 @@ model CartHistoryItem {
   cartHistoryId String
   cartHistory   CartHistory @relation(fields: [cartHistoryId], references: [id], onDelete: Cascade)
 
-  variantId String
-  variant   Variant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  variantColorId String
+  variantColor   VariantColor @relation(fields: [variantColorId], references: [id], onDelete: Cascade)
 }
 
 ///////////////////////
@@ -204,6 +240,6 @@ model OrderItem {
   orderId String
   order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  variantId String
-  variant   Variant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  variantColorId String
+  variantColor   VariantColor @relation(fields: [variantColorId], references: [id], onDelete: Cascade)
 }
