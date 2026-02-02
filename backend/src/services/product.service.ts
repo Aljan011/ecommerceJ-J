@@ -43,6 +43,9 @@ const productService = {
               where: { deletedAt: null },
               include: {
                 color: true,
+                packPrices: {
+                  orderBy: { packSize: "asc" },
+                },
               },
             },
           },

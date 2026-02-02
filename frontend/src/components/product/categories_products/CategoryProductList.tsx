@@ -15,8 +15,8 @@ interface Props {
 export default function CategoryProductList({ categoryId }: Props) {
   const { data, isLoading, isError } = useCategoryProductsQuery(categoryId);
 
-  // Debugging: log the query result
-  console.log("Category products query:", { data, isLoading, isError });
+  // // Debugging: log the query result
+  // console.log("Category products query:", { data, isLoading, isError });
 
   if (isLoading) return <p className="products-loading">Loading products...</p>;
   if (isError) return <p className="products-error">Failed to load products</p>;
@@ -32,7 +32,7 @@ export default function CategoryProductList({ categoryId }: Props) {
         <div className="pb-products-grid">
           {products.map((product: IProduct) => {
             // Defensive chaining
-            const allPrices = product.variants?.flatMap(v => v.colors?.map(c => c.price) ?? []) ?? [];
+            const allPrices = product.variants?.flatMap(v => v.colors?.flatMap(c => c.packPrices?.map(p => p.price) ?? []) ?? []) ?? [];
             const minPrice = allPrices.length > 0 ? Math.min(...allPrices) : 0;
             const maxPrice = allPrices.length > 0 ? Math.max(...allPrices) : 0;
 

@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import ProductGallery from "./ProductGallery";
-import ProductDetailsClient from "./ProductDetailsClient";
+import ProductGallery from "./product_details/ProductGallery";
+import ProductDetailsClient from "./product_details/ProductDetailsClient";
 import type { IProduct } from "@/types";
 
 interface Props {

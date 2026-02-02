@@ -11,16 +11,16 @@ datasource db {
 // USERS
 ///////////////////////
 model User {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String?
-  email       String?  @unique
+  email       String? @unique
   password    String?
-  loginMethod String   @default("NORMAL")
-  userType    String   @default("USER")
-  role        String   @default("USER")
+  loginMethod String  @default("NORMAL")
+  userType    String  @default("USER")
+  role        String  @default("USER")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   cartItems     CartItem[]
@@ -28,14 +28,11 @@ model User {
   orders        Order[]
 }
 
-///////////////////////
-// GUEST USERS
-///////////////////////
 model GuestUser {
   id String @id
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   cartItems CartItem[]
@@ -45,13 +42,13 @@ model GuestUser {
 // CATEGORIES
 ///////////////////////
 model Category {
-  id          String   @id @default(uuid())
-  name        String   @unique
+  id          String  @id @default(uuid())
+  name        String  @unique
   description String
   imageUrl    String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   products Product[]
@@ -61,34 +58,94 @@ model Category {
 // PRODUCTS
 ///////////////////////
 model Product {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
   description String?
   imageUrl    String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   variants Variant[]
+
+  images     ProductImage[]
+  commonUses ProductCommonUse[]
+  features   ProductFeature[]
+  faqs       ProductFAQ[]
+  conclusion ProductConclusion?
 }
 
 ///////////////////////
-// VARIANTS (logical option only)
+// MULTIPLE IMAGES
 ///////////////////////
-model Variant {
-  id   String @id @default(uuid())
-  name String
+model ProductImage {
+  id        String  @id @default(uuid())
+  url       String
+  productId String
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+///////////////////////
+// COMMON USES
+///////////////////////
+model ProductCommonUse {
+  id        String  @id @default(uuid())
+  text      String
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+///////////////////////
+// FEATURES
+///////////////////////
+model ProductFeature {
+  id          String  @id @default(uuid())
+  feature     String
+  description String
+  productId   String
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+///////////////////////
+// FAQ
+///////////////////////
+model ProductFAQ {
+  id        String  @id @default(uuid())
+  q         String
+  a         String
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+///////////////////////
+// CONCLUSION
+///////////////////////
+model ProductConclusion {
+  id        String  @id @default(uuid())
+  text      String
+  productId String  @unique
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+///////////////////////
+// VARIANTS
+///////////////////////
+model Variant {
+  id        String    @id @default(uuid())
+  name      String
+  productId String
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   colors VariantColor[]
 }
@@ -98,7 +155,7 @@ model Variant {
 ///////////////////////
 model Color {
   id        String   @id @default(uuid())
-  name      String
+  name      String   @unique
   hex       String?
 
   createdAt DateTime @default(now())
@@ -108,54 +165,64 @@ model Color {
 }
 
 ///////////////////////
-// VARIANT COLORS (SELLABLE SKU)
+// VARIANT COLORS
 ///////////////////////
 model VariantColor {
-  id String @id @default(uuid())
-
-  price Float
-  stock Int @default(0)
+  id    String @id @default(uuid())
 
   variantId String
   variant   Variant @relation(fields: [variantId], references: [id], onDelete: Cascade)
 
   colorId String
-  color   Color @relation(fields: [colorId], references: [id], onDelete: Cascade)
+  color   Color  @relation(fields: [colorId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+
+  packPrices VariantColorPackPrice[]
+}
+
+///////////////////////
+// PACK SIZES & PRICING
+///////////////////////
+model VariantColorPackPrice {
+  id       String @id @default(uuid())
+  packSize Int
+  price    Float
+  stock    Int
+
+  variantColorId String
+  variantColor   VariantColor @relation(fields: [variantColorId], references: [id], onDelete: Cascade)
 
   cartItems        CartItem[]
   orderItems       OrderItem[]
   cartHistoryItems CartHistoryItem[]
 
-  @@unique([variantId, colorId])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 ///////////////////////
 // CART ITEMS
 ///////////////////////
 model CartItem {
-  id              String   @id @default(uuid())
-  quantity        Int      @default(1)
+  id              String @id @default(uuid())
+  quantity        Int    @default(1)
   priceAtPurchase Float?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
-
   userId String?
-  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   guestId String?
   guest   GuestUser? @relation(fields: [guestId], references: [id], onDelete: Cascade)
 
-  variantColorId String
-  variantColor   VariantColor @relation(fields: [variantColorId], references: [id], onDelete: Cascade)
+  variantColorPackPriceId String
+  variantColorPackPrice   VariantColorPackPrice @relation(fields: [variantColorPackPriceId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, variantColorId])
-  @@unique([guestId, variantColorId])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 ///////////////////////
@@ -165,19 +232,18 @@ model CartHistory {
   id     String @id @default(uuid())
   status String
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
-
-  userId String?
-  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  userId  String?
+  user    User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   guestId String?
 
   orderId String?
-  order   Order? @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order   Order?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   items CartHistoryItem[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 model CartHistoryItem {
@@ -185,15 +251,15 @@ model CartHistoryItem {
   quantity        Int
   priceAtPurchase Float?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
-
   cartHistoryId String
   cartHistory   CartHistory @relation(fields: [cartHistoryId], references: [id], onDelete: Cascade)
 
-  variantColorId String
-  variantColor   VariantColor @relation(fields: [variantColorId], references: [id], onDelete: Cascade)
+  variantColorPackPriceId String
+  variantColorPackPrice   VariantColorPackPrice @relation(fields: [variantColorPackPriceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 ///////////////////////
@@ -204,42 +270,37 @@ model Order {
   totalAmount Float
   status      String @default("PENDING")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
-
-  userId String?
-  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  userId  String?
+  user    User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   guestId String?
 
   shippingName    String
   shippingAddress String
   shippingPhone   String
-
-  paymentMethod String?
-  transactionId String?
-  paidAt        DateTime?
+  paymentMethod   String?
+  transactionId   String?
+  paidAt          DateTime?
 
   items         OrderItem[]
   cartHistories CartHistory[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
-///////////////////////
-// ORDER ITEMS
-///////////////////////
 model OrderItem {
   id              String @id @default(uuid())
   quantity        Int
   priceAtPurchase Float
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
-
   orderId String
-  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  variantColorId String
-  variantColor   VariantColor @relation(fields: [variantColorId], references: [id], onDelete: Cascade)
+  variantColorPackPriceId String
+  variantColorPackPrice   VariantColorPackPrice @relation(fields: [variantColorPackPriceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }

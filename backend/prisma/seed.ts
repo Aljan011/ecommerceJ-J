@@ -1,110 +1,118 @@
+/// <reference types="node" />
+
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-declare const process: any;
 
 async function main() {
-  console.log("🌱 Seeding database...");
+  console.log("Start seeding...");
 
-  // Clean existing data (extra safety)
+  // =========================
+  // CLEAN DEPENDENT DATA
+  // =========================
   await prisma.cartHistoryItem.deleteMany();
   await prisma.cartHistory.deleteMany();
   await prisma.cartItem.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
+
+  await prisma.variantColorPackPrice.deleteMany();
   await prisma.variantColor.deleteMany();
   await prisma.variant.deleteMany();
+  await prisma.productImage.deleteMany();
   await prisma.product.deleteMany();
-  await prisma.color.deleteMany();
-  await prisma.category.deleteMany();
 
-  // -----------------------------
-  // COLORS
-  // -----------------------------
-  const colors = await prisma.color.createMany({
-    data: [
-      { name: "Red", hex: "#FF0000" },
-      { name: "Blue", hex: "#0057FF" },
-      { name: "Green", hex: "#1E8449" },
-      { name: "Black", hex: "#000000" },
-      { name: "White", hex: "#FFFFFF" },
-      { name: "Brown", hex: "#8B4513" },
-      { name: "Yellow", hex: "#F1C40F" },
-      { name: "Orange", hex: "#E67E22" },
-    ],
-  });
-
-  const allColors = await prisma.color.findMany();
-
-  // Helper: random colors
-  const pickColors = () =>
-    allColors.sort(() => 0.5 - Math.random()).slice(0, 3);
-
-  // -----------------------------
+  // =========================
   // CATEGORIES
-  // -----------------------------
-  const categories = [
-    {
-      name: "Paper Bags",
-      description: "Eco-friendly paper bags for retail and packaging",
-    },
-    {
-      name: "Food Packaging",
-      description: "Durable food-safe packaging solutions",
-    },
-    {
-      name: "Custom Printing",
-      description: "Custom printed packaging and branding materials",
-    },
+  // =========================
+  const categoriesData = [
+    { name: "Paper Bags", description: "Eco friendly paper packaging bags", imageUrl: "/categories/paper.jpg" },
+    { name: "Plastic Packaging", description: "Durable plastic packaging solutions", imageUrl: "/categories/plastic.jpg" },
+    { name: "Food Containers", description: "Food grade containers and boxes", imageUrl: "/categories/food.jpg" },
   ];
 
-  for (const categoryData of categories) {
-    const category = await prisma.category.create({
-      data: categoryData,
+  const categories = [];
+  for (const cat of categoriesData) {
+    const category = await prisma.category.upsert({
+      where: { name: cat.name },
+      update: {},
+      create: cat,
     });
+    categories.push(category);
+  }
 
-    // -----------------------------
-    // PRODUCTS (8 per category)
-    // -----------------------------
+  // =========================
+  // COLORS (GLOBAL)
+  // =========================
+  const colorsData = [
+    { name: "Brown", hex: "#8B5A2B" },
+    { name: "White", hex: "#FFFFFF" },
+    { name: "Black", hex: "#000000" },
+    { name: "Red", hex: "#D32F2F" },
+    { name: "Blue", hex: "#1976D2" },
+  ];
+
+  const colors = [];
+  for (const c of colorsData) {
+    const color = await prisma.color.upsert({
+      where: { name: c.name },
+      update: {},
+      create: c,
+    });
+    colors.push(color);
+  }
+
+  // =========================
+  // PRODUCTS + VARIANTS
+  // =========================
+  const packSizes = [50, 100, 200, 500];
+
+  for (const category of categories) {
     for (let i = 1; i <= 8; i++) {
       const product = await prisma.product.create({
         data: {
           name: `${category.name} Product ${i}`,
-          description: `High quality ${category.name.toLowerCase()} item ${i}`,
+          description: `High quality ${category.name.toLowerCase()} product ${i}`,
+          imageUrl: `/products/${category.name.toLowerCase()}-${i}.jpg`,
           categoryId: category.id,
+          images: {
+            create: [
+              { url: `/products/${category.name}-${i}-1.jpg` },
+              { url: `/products/${category.name}-${i}-2.jpg` },
+              { url: `/products/${category.name}-${i}-3.jpg` },
+            ],
+          },
         },
       });
 
-      // -----------------------------
-      // VARIANTS
-      // -----------------------------
-      const variants = ["Small", "Medium", "Large"];
+      const variant = await prisma.variant.create({
+        data: {
+          name: "Standard",
+          productId: product.id,
+        },
+      });
 
-      for (const variantName of variants) {
-        const variant = await prisma.variant.create({
+      // =========================
+      // VARIANT COLORS + PACK PRICES
+      // =========================
+      for (const color of colors) {
+        const variantColor = await prisma.variantColor.create({
           data: {
-            name: variantName,
-            productId: product.id,
+            variantId: variant.id,
+            colorId: color.id,
           },
         });
 
-        // -----------------------------
-        // VARIANT COLORS (price & stock)
-        // -----------------------------
-        const selectedColors = pickColors();
+        for (const pack of packSizes) {
+          const price = pack * (Math.floor(Math.random() * 3) + 5); // Random multiplier for variety
+          const stock = Math.floor(Math.random() * 300) + 50; // 50–350 stock
 
-        for (const color of selectedColors) {
-          await prisma.variantColor.create({
+          await prisma.variantColorPackPrice.create({
             data: {
-              variantId: variant.id,
-              colorId: color.id,
-              price:
-                variantName === "Small"
-                  ? 10
-                  : variantName === "Medium"
-                  ? 15
-                  : 20,
-              stock: Math.floor(Math.random() * 50) + 10,
+              variantColorId: variantColor.id,
+              packSize: pack,
+              price,
+              stock,
             },
           });
         }
@@ -112,12 +120,12 @@ async function main() {
     }
   }
 
-  console.log("✅ Seeding completed successfully.");
+  console.log("Seed completed successfully ✅");
 }
 
 main()
   .catch((e) => {
-    console.error("❌ Seeding error:", e);
+    console.error("Seeding failed ❌", e);
     process.exit(1);
   })
   .finally(async () => {

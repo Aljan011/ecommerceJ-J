@@ -1,5 +1,5 @@
 import CategoryHero from "@/components/category/CategoryHero";
-import CategoryProductList from "@/components/product/CategoryProductList";
+import CategoryProductList from "@/components/product/categories_products/CategoryProductList";
 
 interface Props {
   params: {
