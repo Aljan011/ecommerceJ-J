@@ -30,15 +30,6 @@ const FloatingSidebar = () => {
                     <Phone size={22} />
                 </a>
 
-                {/* Email Button */}
-                <a
-                    href="mailto:jandjsprinting@gmail.com"
-                    className="hm-sidebar-btn hm-email-btn"
-                    title="Email us: jandjsprinting@gmail.com"
-                >
-                    <Mail size={22} />
-                </a>
-
                 {/* View Cart Button */}
                 <a
                     href="/cart"

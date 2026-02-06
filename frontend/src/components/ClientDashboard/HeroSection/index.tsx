@@ -17,10 +17,10 @@ function HeroSection() {
                Lalitpur, Nepal. Custom, eco-friendly packaging solutions for every business.
             </p>
            <button
-  className="hm-hero-cta"
-  onClick={() => window.open("https://wa.me/9779843223219", "_blank")}
+  className="hm-hero-cta" 
+  onClick= {() => window.location.href = '/categories'}
 >
-  Chat with our expert
+  Shop Now
 </button>
           </div>
         </div>

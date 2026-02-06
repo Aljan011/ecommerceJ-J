@@ -91,6 +91,7 @@ model ProductImage {
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 ///////////////////////
@@ -160,6 +161,7 @@ model Color {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   variants VariantColor[]
 }
@@ -201,6 +203,7 @@ model VariantColorPackPrice {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 }
 
 ///////////////////////

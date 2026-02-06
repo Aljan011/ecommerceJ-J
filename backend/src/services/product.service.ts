@@ -6,53 +6,57 @@ const productService = {
   // =====================
 
   async getAllProducts() {
-    return prisma.product.findMany({
-      where: {
-        deletedAt: null,
-      },
-      include: {
-        category: true,
-        variants: {
-          where: { deletedAt: null },
-          include: {
-            colors: {
-              where: { deletedAt: null },
-              include: {
-                color: true, // name, hex
-              },
+  return prisma.product.findMany({
+    where: { deletedAt: null },
+    include: {
+      category: true,
+      images: true,
+      commonUses: true,
+      features: true,
+      faqs: true,
+      conclusion: true,
+      variants: {
+        where: { deletedAt: null },
+        include: {
+          colors: {
+            where: { deletedAt: null },
+            include: {
+              color: true,
+              packPrices: { where: { deletedAt: null }, orderBy: { packSize: "asc" } },
             },
           },
         },
       },
-      orderBy: { createdAt: "desc" },
-    });
-  },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+},
 
-  async getProductById(productId: string) {
-    return prisma.product.findFirst({
-      where: {
-        id: productId,
-        deletedAt: null,
-      },
-      include: {
-        category: true,
-        variants: {
-          where: { deletedAt: null },
-          include: {
-            colors: {
-              where: { deletedAt: null },
-              include: {
-                color: true,
-                packPrices: {
-                  orderBy: { packSize: "asc" },
-                },
-              },
+async getProductById(productId: string) {
+  return prisma.product.findFirst({
+    where: { id: productId, deletedAt: null },
+    include: {
+      category: true,
+      images: true,
+      commonUses: true,
+      features: true,
+      faqs: true,
+      conclusion: true,
+      variants: {
+        where: { deletedAt: null },
+        include: {
+          colors: {
+            where: { deletedAt: null },
+            include: {
+              color: true,
+              packPrices: { where: { deletedAt: null }, orderBy: { packSize: "asc" } },
             },
           },
         },
       },
-    });
-  },
+    },
+  });
+},
 
   async getProductsByCategory(categoryId: string) {
     return prisma.product.findMany({
@@ -69,11 +73,16 @@ const productService = {
               where: { deletedAt: null },
               include: {
                 color: true,
+                packPrices: {
+                  where: { deletedAt: null },
+                  orderBy: { packSize: "asc" },
+                },
               },
             },
           },
         },
       },
+      orderBy: { createdAt: "desc" },
     });
   },
 
@@ -96,6 +105,7 @@ const productService = {
             colors: {
               include: {
                 color: true,
+                packPrices: true,
               },
             },
           },
@@ -123,6 +133,7 @@ const productService = {
             colors: {
               include: {
                 color: true,
+                packPrices: true,
               },
             },
           },

@@ -56,7 +56,6 @@
 //   );
 // }
 
-
 "use client";
 
 import Image from "next/image";
@@ -64,6 +63,8 @@ import Link from "next/link";
 import { useAllProductsQuery } from "@/lib";
 
 import "@/styles/ClientDashboard/OurServices/index.css";
+
+import { getLowestProductPrice } from "@/utils/getLowestProductPrice";
 
 export default function CategoryProductList() {
   const { data: products, isLoading } = useAllProductsQuery();
@@ -75,41 +76,47 @@ export default function CategoryProductList() {
   return (
     <section className="hm-products">
       <div className="hm-container">
-        <h2 className="hm-section-title">Our Products</h2>
+        <h2 className="hm-section-title">Shop Now</h2>
 
         <div className="hm-products-grid">
-          {products?.map((product) => (
-            <div key={product.id} className="hm-product-category">
-              {/* IMAGE */}
-              <div className="hm-category-image">
-                <Image
-                  src={product.imageUrl || "/placeholder-product.jpg"}
-                  alt={product.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="hm-category-img"
-                />
+          {products?.map((product) => {
+            const lowestPrice = getLowestProductPrice(product.variants);
+            return (
+              <div key={product.id} className="hm-product-category">
+                {/* IMAGE */}
+                <div className="hm-category-image">
+                  <Image
+                    src={product.imageUrl || "/placeholder-product.jpg"}
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="hm-category-img"
+                  />
+                </div>
+
+                  {lowestPrice !== null && (
+                    <p className="hm-category-price">
+                      Starting from <strong>Rs. {lowestPrice.toFixed(2)}</strong>
+                    </p>
+                  )}
+                {/* CONTENT */}
+                <div className="hm-category-content">
+                  <h3 className="hm-category-title">{product.name}</h3>
+
+                  <p className="hm-category-desc">
+                    {product.description || "High quality packaging product"}
+                  </p>
+
+                  <Link
+                    href={`/products/${product.id}`}
+                    className="hm-category-link"
+                  >
+                    View Product
+                  </Link>
+                </div>
               </div>
-
-              {/* CONTENT */}
-              <div className="hm-category-content">
-                <h3 className="hm-category-title">
-                  {product.name}
-                </h3>
-
-                <p className="hm-category-desc">
-                  {product.description || "High quality packaging product"}
-                </p>
-
-                <Link
-                  href={`/products/${product.id}`}
-                  className="hm-category-link"
-                >
-                  View Product
-                </Link>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
